@@ -162,12 +162,6 @@ function ReportGenerator() {
                 Reports Dashboard
             </h2>
 
-            {error && (
-                <div className={`p-3 mb-4 rounded ${isDark ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-600'}`}>
-                    {error}
-                </div>
-            )}
-
             {success && (
                 <div className={`p-3 mb-4 rounded ${isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-600'}`}>
                     {success}
@@ -277,7 +271,6 @@ function ReportGenerator() {
                 </div>
             )}
 
-            {/* History Tab */}
             {activeTab === "history" && (
                 <div className={`rounded-lg overflow-hidden ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     {loading ? (

@@ -6,7 +6,7 @@ import LoginModal from '../components/Common/LoginModal';
 import Button from '../components/Common/Button';
 import axios from 'axios';
 import Logo from '../../Assets/imgs/ThakralOne_CCS_Logo.svg';
-import LogoWhite from '../../Assets/imgs/A_gentleman_handing.png';
+import LogoWhite from '../../Assets/imgs/ThakralOne_CCS_Logo.svg';
 import homeImage from '../../Assets/imgs/Image_illustration.png';
 import { FiTool, FiBarChart2, FiPackage, FiArrowRight, FiLogIn } from 'react-icons/fi';
 

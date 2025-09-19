@@ -189,7 +189,6 @@ class UserService {
 
         const authResponse = this.generateAuthResponse(user);
 
-        // Create role-based login notification
         await this.createUserNotification(
             { roles: ['administrator'] },
             `${user.name} (${user.role}) logged in at ${new Date().toLocaleString()}`,
