@@ -1,4 +1,4 @@
-// contexts/ReportSocketContext.js
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useSocket } from './SocketContext';
 import { toast } from 'react-hot-toast';
@@ -13,7 +13,6 @@ export const ReportSocketProvider = ({ children }) => {
     const [popularReports, setPopularReports] = useState([]);
     const [reportCompletion, setReportCompletion] = useState([]);
 
-    // Helper function to create report notifications
     const createReportNotification = (data, type, emoji, toastMethod = toast) => {
         const baseNotification = {
             id: `report-${data.report?._id || data.reportId}-${Date.now()}`,
@@ -84,61 +83,51 @@ export const ReportSocketProvider = ({ children }) => {
         return notification;
     };
 
-    // Report lifecycle events
     useEffect(() => {
         if (!socket) return;
 
-        // Report generated
         const handleReportGenerated = (data) => {
             createReportNotification(data, 'generated', '📊', toast.success);
         };
 
-        // Report scheduled
         const handleReportScheduled = (data) => {
             createReportNotification(data, 'scheduled', '⏰');
         };
 
-        // Report failed
         const handleReportFailed = (data) => {
             createReportNotification(data, 'failed', '❌', toast.error);
         };
 
-        // Report completed
         const handleReportCompleted = (data) => {
             createReportNotification(data, 'completed', '✅');
         };
 
-        // Report downloaded
+
         const handleReportDownloaded = (data) => {
             createReportNotification(data, 'downloaded', '📥');
         };
 
-        // Report shared
         const handleReportShared = (data) => {
             createReportNotification(data, 'shared', '📤');
         };
 
-        // Stats updates
         const handleStatsUpdated = (data) => {
             setReportStats(data);
         };
 
-        // Trends updates
         const handleTrendsUpdated = (data) => {
             setReportTrends(data);
         };
 
-        // Popular reports updates
         const handlePopularReportsUpdated = (data) => {
             setPopularReports(data);
         };
 
-        // Completion metrics updates
         const handleCompletionUpdated = (data) => {
             setReportCompletion(data);
         };
 
-        // Subscribe to all report-related events
+
         const unsubGenerated = subscribe('report-generated', handleReportGenerated);
         const unsubScheduled = subscribe('report-scheduled', handleReportScheduled);
         const unsubFailed = subscribe('report-failed', handleReportFailed);

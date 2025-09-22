@@ -36,26 +36,14 @@ const userSchema = new mongoose.Schema({
         enum: ['coordinator', 'technician', 'manager', 'parts_team', 'administrator'],
         required: true
     },
-    skill: [{
+    skills: [{
         name: {
             type: String,
             enum: [
-                "Hardware",
-                "Software",
-                "Server",
-                "Electronics",
-                "Printer",
-                "Network",
-                "Network Administration",
-                "System Management",
-                "Team Management",
-                "Operations",
-                "Coordination",
-                "Documentation",
-                "Customer Service",
-                "Communication",
-                "Inventory Management",
-                "Logistics"
+                "Hardware", "Software", "Server", "Electronics", "Printer", "Network",
+                "Network Administration", "System Management", "Team Management", "Operations",
+                "Coordination", "Documentation", "Customer Service", "Communication",
+                "Inventory Management", "Logistics"
             ],
             required: true
         },
@@ -63,7 +51,8 @@ const userSchema = new mongoose.Schema({
             type: String,
             trim: true
         }]
-    }],
+    }]
+    ,
     last_login: {
         type: Date
     },
@@ -77,13 +66,10 @@ const userSchema = new mongoose.Schema({
         default: Date.now
     }
 }, {
-    // Remove timestamps since we're manually handling created_at and updated_at
-    // to match the MongoDB schema requirements
     toObject: { virtuals: true },
     toJSON: { virtuals: true }
 });
 
-// Indexes
 userSchema.index({ role: 1 });
 userSchema.index({ last_login: -1 });
 userSchema.index({ created_at: -1 });
@@ -100,12 +86,10 @@ userSchema.index({
     }
 });
 
-// Virtuals
 userSchema.virtual('image_url').get(function () {
     return this.image?.url || null;
 });
 
-// In your User schema, add:
 userSchema.virtual('current_job_count').get(async function () {
     try {
         return await mongoose.model('Job').countDocuments({
@@ -117,13 +101,11 @@ userSchema.virtual('current_job_count').get(async function () {
     }
 });
 
-// Middleware to update updated_at timestamp
 userSchema.pre('save', function (next) {
     this.updated_at = Date.now();
     next();
 });
 
-// Methods
 userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
     const user = await this.findOne({ email, _id: { $ne: excludeUserId } });
     return !!user;
@@ -133,7 +115,6 @@ userSchema.methods.isPasswordMatch = async function (password) {
     return bcrypt.compare(password, this.password);
 };
 
-// Hooks
 userSchema.pre('save', async function (next) {
     if (this.isModified('password') && this.password) {
         this.password = await bcrypt.hash(this.password, 10);

@@ -14,7 +14,7 @@ import BaseInput from '../Common/BaseInput';
 import BaseSelectInput from '../Common/BaseSelectInput';
 import Button from '../Common/Button';
 
-// Constants
+
 const ACCEPTED_FILE_TYPES = [
     'image/jpeg',
     'image/png',
@@ -68,7 +68,7 @@ const initialFormData = () => ({
     warranty_status: 'In Warranty'
 });
 
-// New Customer Modal Component
+
 const NewCustomerModal = ({ isOpen, onClose, onCustomerCreated, getAuthHeaders }) => {
     const [newCustomer, setNewCustomer] = useState({
         name: '',

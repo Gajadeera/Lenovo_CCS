@@ -198,7 +198,6 @@ const ViewJobModal = ({ isOpen, onClose, jobId }) => {
                         {renderCompactField("Assigned To", job.assigned_to?.name || 'Unassigned', <FiUser />)}
                         {renderCompactField("Created", formatDate(job.createdAt), <FiCalendar />)}
 
-                        {/* Parts Requests and Warranty in the same row */}
                         <div className="col-span-4 sm:col-span-2">
                             <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                                 Parts Requests ({partsRequests.length})
@@ -220,7 +219,6 @@ const ViewJobModal = ({ isOpen, onClose, jobId }) => {
                         </div>
                     </div>
 
-                    {/* Description in a single full-width row */}
                     <div className="col-span-4">
                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Description</label>
                         <div className="text-sm p-3 bg-gray-50 rounded-md border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">

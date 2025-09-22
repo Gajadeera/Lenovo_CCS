@@ -13,7 +13,6 @@ const getAllCustomers = async (req, res, next) => {
     try {
         const result = await CustomerService.getAllCustomers(req.query);
 
-        // Handle different return types based on all flag
         if (req.query.all === 'true') {
             res.json(result);
         } else {

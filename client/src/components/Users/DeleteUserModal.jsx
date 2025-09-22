@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Modal from '../Common/BaseModal';
-import Button from '../Common/Button'; // Adjust the import path as needed
+import Button from '../Common/Button';
 
 const DeleteUserModal = ({
     isOpen,

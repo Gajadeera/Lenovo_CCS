@@ -12,7 +12,8 @@ import ViewUserModal from '../Users/SingleUser';
 import ViewSystemIssueModal from '../Issues/SingleIssue';
 import UserProfileModal from '../Users/UserProfile';
 import { useDarkMode } from '../../../context/DarkModeContext';
-import NotificationBell from './NotificationBell'; // Import the NotificationBell component
+import NotificationBell from './NotificationBell';
+import NotificationList from '../Notifications/NotificationList';
 
 const NavBar = () => {
     const { user: currentUser, updateUser } = useAuth();
@@ -23,19 +24,23 @@ const NavBar = () => {
     const [hasSearched, setHasSearched] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [showUserProfile, setShowUserProfile] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
     const searchRef = useRef(null);
-
-    // State for modal management
+    const notificationRef = useRef(null);
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedCollection, setSelectedCollection] = useState(null);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setIsSearchFocused(false);
             }
+
+            if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+                setShowNotifications(false);
+            }
         };
+
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -90,6 +95,14 @@ const NavBar = () => {
         if (updateUser) {
             updateUser(updatedUser);
         }
+    };
+
+    const handleNotificationsClick = () => {
+        setShowNotifications(!showNotifications);
+    };
+
+
+    const handleClearNotification = (notificationId) => {
     };
 
     const renderResultItem = (collection, item) => {
@@ -257,9 +270,20 @@ const NavBar = () => {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            {/* Notification Bell */}
                             {currentUser && (
-                                <NotificationBell userId={currentUser._id} />
+                                <div className="relative" ref={notificationRef}>
+                                    <NotificationBell
+                                        userId={currentUser._id}
+                                        onNotificationsClick={handleNotificationsClick}
+                                    />
+                                    {showNotifications && (
+                                        <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50 border border-gray-200 dark:border-gray-700 max-h-96 overflow-hidden">
+                                            <NotificationList
+                                                onClearNotification={handleClearNotification}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             )}
 
                             <div className="relative w-80" ref={searchRef}>
@@ -289,7 +313,6 @@ const NavBar = () => {
                                     )}
                                 </div>
 
-                                {/* Search Results Dropdown */}
                                 {isSearchFocused && (
                                     <div className="absolute right-0 z-50 mt-1 w-full bg-white dark:bg-gray-800 rounded-lg shadow-xl ring-1 ring-[#52c3cb] ring-opacity-20">
                                         {renderResults()}
@@ -297,7 +320,6 @@ const NavBar = () => {
                                 )}
                             </div>
 
-                            {/* Dark Mode Toggle */}
                             <button
                                 onClick={toggleDarkMode}
                                 className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300"
@@ -310,7 +332,6 @@ const NavBar = () => {
                                 )}
                             </button>
 
-                            {/* User Info */}
                             <div className="flex items-center gap-2">
                                 {currentUser ? (
                                     <>
@@ -343,7 +364,6 @@ const NavBar = () => {
                 </div>
             </nav>
 
-            {/* User Profile Modal */}
             {showUserProfile && (
                 <UserProfileModal
                     isOpen={showUserProfile}

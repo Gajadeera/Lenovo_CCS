@@ -1,4 +1,3 @@
-// components/Icon.jsx
 import React from 'react';
 import * as Icons from 'react-icons/fi';
 import PropTypes from 'prop-types';
@@ -10,11 +9,11 @@ const Icon = ({
     className = '',
     strokeWidth = 1,
     color = 'currentColor',
-    darkColor, // Optional separate color for dark mode
+    darkColor,
     onClick,
     disabled = false
 }) => {
-    const { isDark } = useDarkMode(); // Get dark mode state
+    const { isDark } = useDarkMode();
     const IconComponent = Icons[name];
 
     if (!IconComponent) {
@@ -31,8 +30,6 @@ const Icon = ({
     }[size];
 
     const strokeClass = `stroke-${strokeWidth}`;
-
-    // Use darkColor if provided and in dark mode, otherwise use the regular color
     const iconColor = isDark && darkColor ? darkColor : color;
 
     return (
@@ -50,7 +47,7 @@ Icon.propTypes = {
     className: PropTypes.string,
     strokeWidth: PropTypes.oneOf([1, 2, 3]),
     color: PropTypes.string,
-    darkColor: PropTypes.string, // New prop for dark mode color
+    darkColor: PropTypes.string,
     onClick: PropTypes.func,
     disabled: PropTypes.bool
 };

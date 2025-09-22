@@ -183,9 +183,7 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, deviceData, onDeviceUpdate
                     </div>
                 )}
 
-                {/* Single row for all basic device info */}
                 <div className="grid grid-cols-12 gap-3">
-                    {/* Device Type */}
                     <div className="col-span-12 md:col-span-2">
                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Device Type</label>
                         <select
@@ -200,8 +198,6 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, deviceData, onDeviceUpdate
                             ))}
                         </select>
                     </div>
-
-                    {/* Warranty Status */}
                     <div className="col-span-12 md:col-span-2">
                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Warranty</label>
                         <select
@@ -217,7 +213,6 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, deviceData, onDeviceUpdate
                         </select>
                     </div>
 
-                    {/* Manufacturer */}
                     <div className="col-span-12 md:col-span-2">
                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Manufacturer</label>
                         <input
@@ -230,7 +225,6 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, deviceData, onDeviceUpdate
                         />
                     </div>
 
-                    {/* Model Number */}
                     <div className="col-span-12 md:col-span-2">
                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Model</label>
                         <input
@@ -243,7 +237,6 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, deviceData, onDeviceUpdate
                         />
                     </div>
 
-                    {/* Serial Number */}
                     <div className="col-span-12 md:col-span-2 relative">
                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Serial #</label>
                         <div className="flex">
@@ -268,7 +261,6 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, deviceData, onDeviceUpdate
                         </div>
                     </div>
 
-                    {/* Purchase Date */}
                     <div className="col-span-12 md:col-span-2">
                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Purchase Date</label>
                         <input
@@ -282,7 +274,6 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, deviceData, onDeviceUpdate
                     </div>
                 </div>
 
-                {/* Specifications */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div>
                         <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">CPU</label>
@@ -330,7 +321,6 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, deviceData, onDeviceUpdate
                     </div>
                 </div>
 
-                {/* Notes */}
                 <div>
                     <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Notes</label>
                     <textarea
@@ -343,7 +333,6 @@ const EditDeviceModal = ({ isOpen, onClose, deviceId, deviceData, onDeviceUpdate
                     />
                 </div>
 
-                {/* Form Actions */}
                 <div className="flex justify-end space-x-2 pt-2">
                     <Button
                         onClick={onClose}

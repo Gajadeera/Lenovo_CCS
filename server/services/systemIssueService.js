@@ -32,7 +32,6 @@ class SystemIssueService {
 
         const folder = `Lenovo_CCS/System_Issues/${issueId}`;
 
-        // Clean up any existing resources
         try {
             await cloudinaryService.deleteFolder(folder);
         } catch (folderError) {
@@ -59,7 +58,6 @@ class SystemIssueService {
     static async createSystemIssueNotifications(issue, currentUser) {
         const notifications = [];
 
-        // Admin notification
         notifications.push({
             targetRoles: ['administrator'],
             message: `New system issue reported: ${issue.title}`,
@@ -73,8 +71,6 @@ class SystemIssueService {
                 priority: issue.priority
             }
         });
-
-        // User notification
         notifications.push({
             userId: currentUser._id,
             message: `Your system issue "${issue.title}" has been reported successfully`,
@@ -86,7 +82,7 @@ class SystemIssueService {
             }
         });
 
-        // Manager notification for certain categories
+
         if (['hardware', 'software', 'network'].includes(issue.category)) {
             notifications.push({
                 targetRoles: ['manager'],
@@ -157,20 +153,17 @@ class SystemIssueService {
         let tempFilePaths = files ? files.map(file => file.path) : [];
 
         try {
-            // Validate request data
             const hasBodyData = issueData && Object.keys(issueData).length > 0;
             const hasFiles = files && files.length > 0;
             if (!hasBodyData && !hasFiles) {
                 throw new ApiError(httpStatus.BAD_REQUEST, 'Request data is missing');
             }
 
-            // Create issue
             const issuePayload = await this.validateAndCreateIssue(issueData);
             issuePayload.reported_by = currentUser._id;
 
             const systemIssue = await SystemIssue.create(issuePayload);
 
-            // Handle screenshots
             if (hasFiles) {
                 systemIssue.screenshots = await this.handleScreenshotUploads(files, systemIssue._id);
                 await systemIssue.save();
@@ -180,7 +173,6 @@ class SystemIssueService {
                 .populate('reported_by', 'name email')
                 .populate('assigned_to', 'name email');
 
-            // Create notifications and emit events
             await this.createSystemIssueNotifications(populatedIssue, currentUser);
             await this.emitSystemIssueEvent('created', populatedIssue, currentUser);
 
@@ -296,11 +288,8 @@ class SystemIssueService {
         let tempFilePaths = files ? files.map(file => file.path) : [];
 
         try {
-            // Find and validate issue
             const systemIssue = await SystemIssue.findById(issueId);
             if (!systemIssue) throw new ApiError(404, 'System issue not found');
-
-            // Permission check
             const isOwner = systemIssue.reported_by.equals(currentUser._id);
             const isAssigned = systemIssue.assigned_to && systemIssue.assigned_to.equals(currentUser._id);
             if (currentUser.role === 'technician' && !isOwner && !isAssigned) {
@@ -313,8 +302,6 @@ class SystemIssueService {
                 priority: systemIssue.priority,
                 status: systemIssue.status
             };
-
-            // Handle screenshot deletions
             if (updateData.screenshots_to_delete) {
                 const screenshotsToDelete = typeof updateData.screenshots_to_delete === 'string' ?
                     JSON.parse(updateData.screenshots_to_delete) : updateData.screenshots_to_delete;
@@ -331,13 +318,11 @@ class SystemIssueService {
                 }
             }
 
-            // Handle new screenshot uploads
             if (files && files.length > 0) {
                 const newScreenshots = await this.handleScreenshotUploads(files, systemIssue._id);
                 systemIssue.screenshots.push(...newScreenshots);
             }
 
-            // Prepare update data
             const { title, description, category, priority, status } = updateData;
             const updateDataObj = {
                 ...(title !== undefined && { title }),
@@ -349,7 +334,6 @@ class SystemIssueService {
                 updated_at: new Date()
             };
 
-            // Update issue
             const updatedIssue = await SystemIssue.findByIdAndUpdate(
                 issueId,
                 updateDataObj,
@@ -358,7 +342,6 @@ class SystemIssueService {
                 .populate('assigned_to', 'name email')
                 .populate('comments.user_id', 'name email');
 
-            // Determine changed fields
             const changedFields = [];
             if (title !== undefined && title !== oldValues.title) changedFields.push('title');
             if (category !== undefined && category !== oldValues.category) changedFields.push('category');
@@ -367,7 +350,6 @@ class SystemIssueService {
             if (files && files.length > 0) changedFields.push('screenshots');
             if (updateData.screenshots_to_delete) changedFields.push('screenshots');
 
-            // Send notifications if fields changed
             if (changedFields.length > 0) {
                 await this.createUpdateNotifications(updatedIssue, currentUser, changedFields);
                 await this.emitSystemIssueEvent('updated', updatedIssue, currentUser, { changedFields, oldValues });
@@ -403,7 +385,6 @@ class SystemIssueService {
     static async createUpdateNotifications(issue, currentUser, changedFields) {
         const notifications = [];
 
-        // Admin notification
         notifications.push({
             targetRoles: ['administrator'],
             message: `System issue updated: ${issue.title}`,
@@ -417,7 +398,6 @@ class SystemIssueService {
             }
         });
 
-        // Reporter notification
         if (issue.reported_by && !issue.reported_by._id.equals(currentUser._id)) {
             notifications.push({
                 userId: issue.reported_by._id,
@@ -433,7 +413,6 @@ class SystemIssueService {
             });
         }
 
-        // Assigned technician notification
         if (issue.assigned_to && !issue.assigned_to._id.equals(currentUser._id)) {
             notifications.push({
                 userId: issue.assigned_to._id,
@@ -467,7 +446,6 @@ class SystemIssueService {
                 throw new ApiError(400, 'Cannot delete an issue that has been processed');
             }
 
-            // Clean up screenshots
             if (systemIssue.screenshots && systemIssue.screenshots.length > 0) {
                 const publicIds = systemIssue.screenshots.map(screenshot => screenshot.public_id);
                 await cloudinaryService.deleteMultipleFiles(publicIds);
@@ -481,10 +459,8 @@ class SystemIssueService {
 
             await SystemIssue.findByIdAndDelete(systemIssue._id);
 
-            // Create notifications
             await this.createDeleteNotifications(systemIssue, currentUser);
 
-            // Emit events
             await this.emitSystemIssueEvent('deleted', systemIssue, currentUser);
 
             return {
@@ -513,8 +489,6 @@ class SystemIssueService {
 
     static async createDeleteNotifications(issue, currentUser) {
         const notifications = [];
-
-        // Admin notification
         notifications.push({
             targetRoles: ['administrator'],
             message: `System issue deleted: ${issue.title}`,
@@ -527,7 +501,6 @@ class SystemIssueService {
             }
         });
 
-        // Reporter notification
         if (issue.reported_by && !issue.reported_by.equals(currentUser._id)) {
             notifications.push({
                 userId: issue.reported_by._id,
@@ -542,7 +515,6 @@ class SystemIssueService {
             });
         }
 
-        // Assigned technician notification
         if (issue.assigned_to && !issue.assigned_to.equals(currentUser._id)) {
             notifications.push({
                 userId: issue.assigned_to._id,

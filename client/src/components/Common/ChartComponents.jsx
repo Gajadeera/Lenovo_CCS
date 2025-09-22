@@ -1,4 +1,3 @@
-// ChartComponents.jsx
 import React from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { NoDataMessage, getChartColors } from './BaseAnalytics';

@@ -12,8 +12,6 @@ const createDevice = async (req, res, next) => {
 const getAllDevices = async (req, res, next) => {
     try {
         const result = await DeviceService.getAllDevices(req.query);
-
-        // Handle different return types based on all flag
         if (req.query.all === 'true') {
             res.json(result);
         } else {

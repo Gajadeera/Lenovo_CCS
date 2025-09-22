@@ -1,5 +1,5 @@
 import React from 'react';
-import { getChartColors } from './BaseAnalytics'; // Import the function
+import { getChartColors } from './BaseAnalytics';
 
 export const CustomTooltip = ({ active, payload, label, isDark, formatter }) => {
     const colors = getChartColors(isDark);

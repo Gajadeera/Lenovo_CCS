@@ -69,18 +69,12 @@ const initializeSocket = (server) => {
         userData.socketIds.push(socket.id);
         userData.lastActivity = currentTime;
         connectedUsers.set(userId, userData);
-
-        // Join necessary rooms
         socket.join(`user-${userId}`);
         if (role) {
             socket.join(`role-${role.toLowerCase()}`);
             userData.rooms.add(`role-${role.toLowerCase()}`);
         }
-
-        // Send initial online users list
         updateOnlineUsers();
-
-        // NOTIFICATION HANDLERS - UPDATED FOR ROLE-BASED NOTIFICATIONS
         socket.on('authenticate', async (data) => {
             try {
                 const { userId: authUserId, userRole } = data;
@@ -91,8 +85,6 @@ const initializeSocket = (server) => {
 
                 socket.userId = authUserId;
                 socket.userRole = userRole;
-
-                // Get notifications including role-based ones
                 const notifications = await NotificationService.getUserNotifications(authUserId, userRole);
                 socket.emit('initial_notifications', {
                     success: true,
@@ -196,7 +188,6 @@ const initializeSocket = (server) => {
             }
         });
 
-        // CONNECTION MANAGEMENT HANDLERS
         socket.on('requestOnlineUsers', (callback) => {
             updateOnlineUsers();
             if (callback) callback({
@@ -271,7 +262,6 @@ const initializeSocket = (server) => {
     return io;
 };
 
-// Notification broadcast helper - UPDATED FOR ROLE-BASED NOTIFICATIONS
 const broadcastNotification = async (options) => {
     if (!ioInstance) {
         console.error('No IO instance available for broadcasting');
@@ -281,13 +271,11 @@ const broadcastNotification = async (options) => {
     try {
         const notification = await NotificationService.createNotification(options);
 
-        // Emit to specific user if userId is provided
         if (options.userId) {
             ioInstance.to(`user-${options.userId}`).emit('new_notification', notification);
             console.log(`Notification sent to user ${options.userId}: ${options.message}`);
         }
 
-        // Emit to roles if targetRoles are provided
         if (options.targetRoles && options.targetRoles.length > 0) {
             options.targetRoles.forEach(role => {
                 const roomName = `role-${role.toLowerCase()}`;
@@ -304,7 +292,6 @@ const broadcastNotification = async (options) => {
     }
 };
 
-// Helper to emit to specific roles
 const emitToRoles = (roles, event, data) => {
     if (!ioInstance) {
         console.error('No IO instance available for role emission');
@@ -318,7 +305,6 @@ const emitToRoles = (roles, event, data) => {
     });
 };
 
-// Helper to emit to specific user
 const emitToUser = (userId, event, data) => {
     if (!ioInstance) {
         console.error('No IO instance available for user emission');
@@ -329,12 +315,10 @@ const emitToUser = (userId, event, data) => {
     console.log(`Event '${event}' emitted to user ${userId}`);
 };
 
-// Get user connection info
 const getUser = (userId) => {
     return connectedUsers.get(userId);
 };
 
-// Get all online users
 const getOnlineUsers = () => {
     return Array.from(connectedUsers.values()).map(user => ({
         userId: user.userId,
@@ -346,7 +330,6 @@ const getOnlineUsers = () => {
     }));
 };
 
-// Get users by role
 const getOnlineUsersByRole = (role) => {
     return Array.from(connectedUsers.values())
         .filter(user => user.role === role)
@@ -357,7 +340,6 @@ const getOnlineUsersByRole = (role) => {
         }));
 };
 
-// Force disconnect user
 const disconnectUser = (userId) => {
     const userData = connectedUsers.get(userId);
     if (userData && ioInstance) {

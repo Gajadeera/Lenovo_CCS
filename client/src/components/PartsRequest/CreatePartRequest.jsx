@@ -28,7 +28,7 @@ const CreatePartRequest = ({ isOpen, onClose, onCreate, jobs, currentUser }) => 
                 url: URL.createObjectURL(file),
                 name: file.name,
                 type: file.type.startsWith('image') ? 'image' : 'document',
-                file // Store the actual file for upload
+                file
             }))]
         }));
     };
@@ -57,7 +57,7 @@ const CreatePartRequest = ({ isOpen, onClose, onCreate, jobs, currentUser }) => 
                 formPayload.append(`attachments`, attachment.file);
             });
 
-            const response = await axios.post('/api/parts-requests', formPayload, {
+            const response = await axios.post('http://localhost:5000/parts-requests', formPayload, {
                 headers: {
                     'Authorization': `Bearer ${currentUser.token}`,
                     'Content-Type': 'multipart/form-data'

@@ -14,10 +14,8 @@ const BaseInput = ({
     dense = false,
     ...rest
 }) => {
-    const { isDark } = useDarkMode(); // Get dark mode state
+    const { isDark } = useDarkMode();
     const InputComponent = multiline ? 'textarea' : 'input';
-
-    // Height classes based on props
     const heightClass = compact ? 'py-1' : dense ? 'py-0.5' : 'py-1.5';
     const textSizeClass = compact ? 'text-xs' : 'text-sm';
 

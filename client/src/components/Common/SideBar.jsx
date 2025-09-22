@@ -19,7 +19,6 @@ const SideBar = ({
       transition-all duration-300 ease-in-out
       ${isCollapsed ? 'w-16' : 'w-56'}`}
         >
-            {/* Collapse/Expand Button */}
             <div className="p-4 flex justify-end">
                 <Button
                     onClick={toggleCollapse}
@@ -36,7 +35,6 @@ const SideBar = ({
                 />
             </div>
 
-            {/* Navigation Links */}
             <div className="flex-1 overflow-y-auto p-2 space-y-1">
                 {links.map((link) => (
                     <div key={link.view} className="py-1">
@@ -60,7 +58,6 @@ const SideBar = ({
                 ))}
             </div>
 
-            {/* Sign Out Button */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-700">
                 <Button
                     onClick={signout}

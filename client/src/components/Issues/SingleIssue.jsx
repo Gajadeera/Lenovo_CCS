@@ -121,7 +121,7 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
             await axios.delete(`http://localhost:5000/system-issues/${issueId}`, config);
             onClose();
             setShowDeleteModal(false);
-            onIssueUpdate?.(null); // Notify parent that issue was deleted
+            onIssueUpdate?.(null);
         } catch (err) {
             setError(err.response?.data?.message || err.message || 'Failed to delete issue');
             setShowDeleteModal(false);
@@ -153,7 +153,7 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
 
     const canEdit = ['administrator', 'manager'].includes(currentUser?.role) ||
         currentUser?._id === issue.reported_by?._id;
-    const canDelete = ['administrator', 'manager'].includes(currentUser?.role);
+    const canDelete = currentUser?.role?.toLowerCase() === 'administrator';
 
     return (
         <>
@@ -166,7 +166,6 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
                         </div>
                     )}
 
-                    {/* Basic Information Grid */}
                     <div className="grid grid-cols-4 gap-2">
                         {renderCompactField("Title", issue.title, <FiAlertCircle />)}
                         {renderCompactField("Status", (
@@ -186,7 +185,6 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
                         {renderCompactField("Last Updated", formatDate(issue.updated_at), <FiClock />)}
                     </div>
 
-                    {/* Description */}
                     <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
                         <div className="text-sm p-2 bg-gray-50 rounded border border-gray-200 whitespace-pre-line">
@@ -194,7 +192,6 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
                         </div>
                     </div>
 
-                    {/* Screenshots */}
                     {issue.screenshots?.length > 0 && (
                         <div>
                             <label className="block text-xs font-medium text-gray-500 mb-1">Screenshots</label>
@@ -220,8 +217,6 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
                             </div>
                         </div>
                     )}
-
-                    {/* Resolution (if resolved) */}
                     {issue.resolution && (
                         <div>
                             <label className="block text-xs font-medium text-gray-500 mb-1">Resolution</label>
@@ -231,7 +226,6 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
                         </div>
                     )}
 
-                    {/* Comments Section */}
                     <div className="border-t pt-3">
                         <CommentSection
                             issueId={issueId}
@@ -240,7 +234,6 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
                         />
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="flex justify-end space-x-2 pt-3 border-t">
                         <Button
                             type="button"
@@ -276,7 +269,6 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
                 </div>
             </Modal>
 
-            {/* Edit Modal */}
             <EditIssueModal
                 key={`edit-${issueId}`}
                 isOpen={showEditModal}
@@ -293,7 +285,6 @@ const SingleIssueModal = ({ isOpen, onClose, issueId, onIssueUpdate }) => {
                 onIssueUpdate={handleIssueUpdated}
             />
 
-            {/* Delete Modal */}
             <DeleteIssueModal
                 isOpen={showDeleteModal}
                 onClose={handleDeleteModalClose}

@@ -27,7 +27,6 @@ const DataTable = ({
         }
     };
 
-    // Loading state
     if (loading && data.length === 0) {
         return (
             <div className={`flex justify-center items-center p-6 space-x-3 ${isDark ? 'text-gray-300' : 'text-[#305777]'}`}>
@@ -37,7 +36,6 @@ const DataTable = ({
         );
     }
 
-    // Error state
     if (error) {
         return (
             <div className={`border ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'} rounded-lg overflow-hidden`}>
@@ -58,7 +56,6 @@ const DataTable = ({
         );
     }
 
-    // Empty state
     if (data.length === 0) {
         return (
             <div className={`border ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'} rounded-lg overflow-hidden`}>
@@ -69,10 +66,8 @@ const DataTable = ({
         );
     }
 
-    // Normal state with data
     return (
         <div className={`border ${isDark ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'} rounded-lg overflow-hidden`}>
-            {/* Table Section */}
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead className={headerClassName}>
@@ -135,7 +130,7 @@ const DataTable = ({
                 </table>
             </div>
 
-            {/* Pagination Section */}
+
             {totalCount > limit && (
                 <div className={`flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t ${isDark ? 'border-gray-700 bg-gray-900 text-gray-300' : 'border-gray-200 bg-white text-[#305777]'}`}>
                     <div className="flex items-center space-x-2 mb-3 sm:mb-0">

@@ -1,4 +1,3 @@
-// contexts/IssueSocketContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useSocket } from './SocketContext';
 import { toast } from 'react-hot-toast';
@@ -12,8 +11,6 @@ export const IssueSocketProvider = ({ children }) => {
     const [issueTrends, setIssueTrends] = useState([]);
     const [recentIssues, setRecentIssues] = useState([]);
     const [priorityDistribution, setPriorityDistribution] = useState([]);
-
-    // Helper function to create issue notifications
     const createIssueNotification = (data, type, emoji, toastMethod = toast) => {
         const baseNotification = {
             id: `issue-${data.issue?._id || data.issueId}-${Date.now()}`,
@@ -85,61 +82,49 @@ export const IssueSocketProvider = ({ children }) => {
         return notification;
     };
 
-    // Issue lifecycle events
     useEffect(() => {
         if (!socket) return;
 
-        // Issue created
         const handleIssueCreated = (data) => {
             createIssueNotification(data, 'created', '⚠️', toast.error);
         };
 
-        // Issue updated
         const handleIssueUpdated = (data) => {
             createIssueNotification(data, 'updated', '✏️');
         };
 
-        // Status changed
         const handleStatusChanged = (data) => {
             createIssueNotification(data, 'status-changed', '🔄');
         };
 
-        // Issue assigned
         const handleIssueAssigned = (data) => {
             createIssueNotification(data, 'assigned', '👤', toast.success);
         };
 
-        // Comment added
         const handleCommentAdded = (data) => {
             createIssueNotification(data, 'comment', '💬');
         };
 
-        // Issue resolved
         const handleIssueResolved = (data) => {
             createIssueNotification(data, 'resolved', '✅', toast.success);
         };
 
-        // Stats updates
         const handleStatsUpdated = (data) => {
             setIssueStats(data);
         };
 
-        // Trends updates
         const handleTrendsUpdated = (data) => {
             setIssueTrends(data);
         };
 
-        // Recent issues updates
         const handleRecentIssuesUpdated = (data) => {
             setRecentIssues(data);
         };
 
-        // Priority distribution updates
         const handlePriorityDistributionUpdated = (data) => {
             setPriorityDistribution(data);
         };
 
-        // Subscribe to all issue-related events
         const unsubCreated = subscribe('issue-created', handleIssueCreated);
         const unsubUpdated = subscribe('issue-updated', handleIssueUpdated);
         const unsubStatusChanged = subscribe('issue-status-changed', handleStatusChanged);

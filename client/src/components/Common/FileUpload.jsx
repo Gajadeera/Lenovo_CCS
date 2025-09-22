@@ -15,7 +15,6 @@ const FileUpload = ({
     const fileInputRef = useRef(null);
 
     const handleFileChange = useCallback((selectedFiles) => {
-        // Filter files by accepted types and size
         const validFiles = selectedFiles.filter(file => {
             if (accept !== '*/*' && !file.type.match(accept.replace('*', '.*'))) {
                 return false;
@@ -26,7 +25,6 @@ const FileUpload = ({
             return true;
         });
 
-        // Apply max files limit
         const newFiles = maxFiles === 1
             ? validFiles.slice(0, 1)
             : validFiles.slice(0, maxFiles - files.length);

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useDarkMode } from '../../../context/DarkModeContext';
-import { useNotification } from '../../../context/NotificationContext'; // Import the new context
+import { useNotification } from '../../../context/NotificationContext';
 import toast from 'react-hot-toast';
 import DataTable from '../Common/DataTable';
 import { FiCheckCircle, FiEye, FiTrash2 } from 'react-icons/fi';
@@ -11,7 +11,7 @@ import { FiCheckCircle, FiEye, FiTrash2 } from 'react-icons/fi';
 const NotificationList = ({ onClearNotification }) => {
     const { user: currentUser } = useAuth();
     const { isDark } = useDarkMode();
-    const { allNotifications: realTimeNotifications, markAsRead, markAllAsRead } = useNotification(); // Use the context
+    const { allNotifications: realTimeNotifications, markAsRead, markAllAsRead } = useNotification();
 
     const [persistedNotifications, setPersistedNotifications] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -61,13 +61,11 @@ const NotificationList = ({ onClearNotification }) => {
         }
     };
 
-    // Filter real-time notifications based on user role
     const filteredRealtimeNotifications = realTimeNotifications.filter(notification =>
         notification.recipientId === currentUser._id ||
         (isAdminOrManager && notification.broadcastToRoles?.includes(currentUser.role))
     );
 
-    // Combine persisted and real-time notifications, avoiding duplicates
     const allNotifications = [
         ...persistedNotifications,
         ...filteredRealtimeNotifications.filter(rtNotif =>
@@ -75,19 +73,17 @@ const NotificationList = ({ onClearNotification }) => {
         )
     ];
 
-    const handleClear = async (notificationId) => {
+    const handleMarkAsRead = async (notificationId) => {
         try {
-            // For persisted notifications, call the API
             if (persistedNotifications.some(n => n._id === notificationId)) {
                 await axios.patch(`http://localhost:5000/notifications/${notificationId}/read`, {}, {
                     headers: { Authorization: `Bearer ${currentUser?.token}` }
                 });
 
                 setPersistedNotifications(prev =>
-                    prev.filter(n => n._id !== notificationId)
+                    prev.map(n => n._id === notificationId ? { ...n, isRead: true } : n)
                 );
             } else {
-                // For real-time notifications, use the context method
                 markAsRead(notificationId);
             }
 
@@ -98,20 +94,29 @@ const NotificationList = ({ onClearNotification }) => {
         }
     };
 
+    const handleRowClick = (notification) => {
+        const notificationId = notification._id || notification.id;
+        const isRead = notification.isRead || notification.read;
+
+        if (!isRead) {
+            handleMarkAsRead(notificationId);
+        }
+
+    };
+
     const handleMarkAllAsRead = async () => {
         try {
-            // Mark all persisted notifications as read via API
             await axios.patch(`http://localhost:5000/notifications/mark-all-read`, {
                 userId: currentUser._id
             }, {
                 headers: { Authorization: `Bearer ${currentUser?.token}` }
             });
 
-            // Mark all real-time notifications as read via context
             markAllAsRead();
+            setPersistedNotifications(prev =>
+                prev.map(n => ({ ...n, isRead: true }))
+            );
 
-            // Refresh persisted notifications
-            fetchNotifications();
             toast.success('All notifications marked as read');
         } catch (err) {
             toast.error('Failed to mark all notifications as read');
@@ -126,22 +131,24 @@ const NotificationList = ({ onClearNotification }) => {
         {
             key: 'message',
             header: 'Message',
-            accessor: (notification) => (
-                <div className="flex flex-col">
-                    <span className={`font-medium ${notification.isRead || notification.read ? '' : 'font-bold'}`}>
-                        {notification.message}
-                    </span>
-                    <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                        {new Date(notification.createdAt || notification.timestamp).toLocaleString()}
-                    </span>
-                </div>
-            )
+            accessor: (notification) => {
+                const isRead = notification.isRead || notification.read;
+                return (
+                    <div className="flex flex-col">
+                        <span className={`font-medium ${isRead ? '' : 'font-bold'}`}>
+                            {notification.message}
+                        </span>
+                        <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                            {new Date(notification.createdAt || notification.timestamp).toLocaleString()}
+                        </span>
+                    </div>
+                );
+            }
         },
         {
             key: 'type',
             header: 'Type',
             accessor: (notification) => {
-                // Format the type for display
                 if (notification.type?.includes('parts-')) {
                     return 'Parts Request';
                 } else if (notification.type?.includes('job-')) {
@@ -176,7 +183,7 @@ const NotificationList = ({ onClearNotification }) => {
         {
             icon: <FiCheckCircle className="h-4 w-4" />,
             title: 'Mark as Read',
-            onClick: (notification) => handleClear(notification._id || notification.id)
+            onClick: (notification) => handleMarkAsRead(notification._id || notification.id)
         }
     ];
 
@@ -219,6 +226,14 @@ const NotificationList = ({ onClearNotification }) => {
                     rowActions={rowActions}
                     emptyStateMessage="No notifications"
                     headerClassName={isDark ? 'bg-gray-700' : 'bg-gray-100'}
+                    onRowClick={handleRowClick} // Add row click handler
+                    rowClassName={(notification) => {
+                        const isRead = notification.isRead || notification.read;
+                        return `cursor-pointer ${isRead
+                            ? (isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100')
+                            : (isDark ? 'bg-blue-900 hover:bg-blue-800' : 'bg-blue-50 hover:bg-blue-100')
+                            }`;
+                    }}
                 />
             )}
         </div>

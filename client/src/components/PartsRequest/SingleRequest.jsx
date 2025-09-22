@@ -56,29 +56,29 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
 
     const getStatusColor = (status) => {
         const colors = {
-            'Approved': 'bg-green-100 text-green-800',
-            'Pending': 'bg-yellow-100 text-yellow-800',
-            'Rejected': 'bg-red-100 text-red-800',
-            'Fulfilled': 'bg-blue-100 text-blue-800'
+            'Approved': 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300',
+            'Pending': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
+            'Rejected': 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+            'Fulfilled': 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+        return colors[status] || 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300';
     };
 
     const getPriorityColor = (priority) => {
         const colors = {
-            'High': 'bg-red-100 text-red-800',
-            'Medium': 'bg-yellow-100 text-yellow-800',
-            'Low': 'bg-blue-100 text-blue-800'
+            'High': 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+            'Medium': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300',
+            'Low': 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
         };
-        return colors[priority] || 'bg-gray-100 text-gray-800';
+        return colors[priority] || 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300';
     };
 
     const getFileIcon = (fileType) => {
-        if (!fileType) return <FiFile className="text-gray-500" />;
-        if (fileType.includes('image')) return <FiImage className="text-blue-500" />;
-        if (fileType.includes('pdf')) return <FiFileText className="text-red-500" />;
-        if (fileType.includes('word')) return <FiFileText className="text-blue-600" />;
-        return <FiFile className="text-gray-500" />;
+        if (!fileType) return <FiFile className="text-gray-500 dark:text-gray-400" />;
+        if (fileType.includes('image')) return <FiImage className="text-blue-500 dark:text-blue-400" />;
+        if (fileType.includes('pdf')) return <FiFileText className="text-red-500 dark:text-red-400" />;
+        if (fileType.includes('word')) return <FiFileText className="text-blue-600 dark:text-blue-400" />;
+        return <FiFile className="text-gray-500 dark:text-gray-400" />;
     };
 
     const formatDate = (dateString) => {
@@ -99,44 +99,44 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
 
     const renderCompactField = (label, value, icon) => (
         <div className="col-span-4 sm:col-span-2 lg:col-span-1">
-            <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</label>
             <div className="flex items-center text-sm h-8">
-                {icon && React.cloneElement(icon, { className: "text-gray-400 mr-1", size: 14 })}
-                <span className="truncate">{value || 'N/A'}</span>
+                {icon && React.cloneElement(icon, { className: "text-gray-400 dark:text-gray-500 mr-1", size: 14 })}
+                <span className="truncate text-gray-900 dark:text-white">{value || 'N/A'}</span>
             </div>
         </div>
     );
 
     if (loading) return (
         <Modal isOpen={isOpen} onClose={onClose} title="Parts Request Details" size="lg">
-            <div className="flex justify-center items-center h-40">Loading...</div>
+            <div className="flex justify-center items-center h-40 text-gray-500 dark:text-gray-400">Loading...</div>
         </Modal>
     );
 
     if (error) return (
         <Modal isOpen={isOpen} onClose={onClose} title="Parts Request Details" size="lg">
-            <div className="flex justify-center items-center h-40 text-red-500 text-sm">{error}</div>
+            <div className="flex justify-center items-center h-40 text-red-500 dark:text-red-400 text-sm">{error}</div>
         </Modal>
     );
 
     if (!request) return (
         <Modal isOpen={isOpen} onClose={onClose} title="Parts Request Details" size="lg">
-            <div className="flex justify-center items-center h-40 text-sm">Request not found</div>
+            <div className="flex justify-center items-center h-40 text-sm text-gray-500 dark:text-gray-400">Request not found</div>
         </Modal>
     );
 
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose} title={`Parts Request #${request.request_number || requestId}`} size="xl">
-                <div className="p-4 space-y-3">
+                <div className="p-4 space-y-4">
                     {error && (
-                        <div className="p-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded flex items-center">
-                            <FiX className="mr-1" size={14} />
+                        <div className="p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-md flex items-center">
+                            <FiX className="mr-2" />
                             {error}
                         </div>
                     )}
 
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-4 gap-3">
                         {renderCompactField("Status",
                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(request.status)}`}>
                                 {request.status}
@@ -166,16 +166,16 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Parts Description</label>
-                        <div className="text-sm p-2 bg-gray-50 rounded border border-gray-200">
+                        <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Parts Description</label>
+                        <div className="text-sm p-3 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white">
                             {formatPartsDescription(request.parts_description)}
                         </div>
                     </div>
 
                     {request.notes && (
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Technician Notes</label>
-                            <div className="text-sm p-2 bg-gray-50 rounded border border-gray-200">
+                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Technician Notes</label>
+                            <div className="text-sm p-3 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white">
                                 {request.notes}
                             </div>
                         </div>
@@ -183,8 +183,8 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
 
                     {request.rejection_reason && (
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Rejection Reason</label>
-                            <div className="text-sm p-2 bg-red-50 rounded border border-red-200 text-red-600">
+                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Rejection Reason</label>
+                            <div className="text-sm p-3 bg-red-50 dark:bg-red-900/30 rounded-md border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300">
                                 {request.rejection_reason}
                             </div>
                         </div>
@@ -192,19 +192,19 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
 
                     {request.attachments?.length > 0 && (
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">
+                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                                 Attachments ({request.attachments.length})
                             </label>
                             <div className="space-y-2">
                                 {request.attachments.map((file, i) => (
-                                    <div key={i} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
+                                    <div key={i} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
                                         <div className="flex items-center">
-                                            <div className="mr-2">
+                                            <div className="mr-3">
                                                 {getFileIcon(file.type)}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-medium">{file.name || `Attachment ${i + 1}`}</p>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="text-sm font-medium text-gray-900 dark:text-white">{file.name || `Attachment ${i + 1}`}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
                                                     {file.type} • {formatDate(file.uploaded_at)}
                                                 </p>
                                             </div>
@@ -213,7 +213,7 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
                                             href={file.url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="p-1 text-gray-500 hover:text-blue-500"
+                                            className="p-1 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400"
                                             download
                                         >
                                             <FiDownload size={16} />
@@ -226,39 +226,39 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
 
                     {request.attachments?.some(f => f.type?.includes('image')) && (
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">
+                            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                                 Images
                             </label>
-                            <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-12 gap-2">
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                                 {request.attachments
                                     .filter(f => f.type?.includes('image'))
                                     .map((img, i) => (
                                         <div
                                             key={i}
-                                            className="relative aspect-square cursor-pointer"
+                                            className="relative aspect-square cursor-pointer group"
                                             onClick={() => setZoomedImage(img.url)}
                                         >
                                             <img
                                                 src={img.url}
-                                                className="w-full h-full object-cover rounded border border-gray-200 hover:opacity-90"
+                                                className="w-full h-full object-cover rounded-md border border-gray-200 dark:border-gray-600 group-hover:opacity-90 transition-opacity"
                                                 alt={img.name || `Request image ${i + 1}`}
                                                 onError={(e) => {
                                                     e.target.onerror = null;
                                                     e.target.src = '/placeholder-image.jpg';
                                                 }}
                                             />
+                                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-md" />
                                         </div>
                                     ))}
                             </div>
                         </div>
                     )}
 
-                    <div className="flex justify-end space-x-2 pt-2">
+                    <div className="flex justify-end space-x-3 pt-4">
                         <Button
                             type="button"
                             variant="outline"
                             onClick={onClose}
-                            size="small"
                         >
                             Close
                         </Button>
@@ -270,7 +270,6 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
                                     type="button"
                                     variant="primary"
                                     onClick={() => setShowEditModal(true)}
-                                    size="small"
                                     icon={FiEdit}
                                 >
                                     Edit Request
@@ -280,7 +279,6 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
                 </div>
             </Modal>
 
-            {/* Edit Request Modal */}
             <EditPartRequest
                 isOpen={showEditModal}
                 onClose={() => setShowEditModal(false)}
@@ -290,22 +288,21 @@ const SingleRequestModal = ({ isOpen, onClose, requestId, onRequestUpdate }) => 
                 request={request}
             />
 
-            {/* Zoomed Image Modal */}
             {zoomedImage && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+                    className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
                     onClick={() => setZoomedImage(null)}
                 >
                     <div className="relative max-w-[90vw] max-h-[90vh]">
                         <button
-                            className="absolute -top-10 right-0 text-white hover:text-gray-300"
+                            className="absolute -top-12 right-0 text-white hover:text-gray-300 p-2"
                             onClick={() => setZoomedImage(null)}
                         >
                             <FiX size={24} />
                         </button>
                         <img
                             src={zoomedImage}
-                            className="max-w-[80vw] max-h-[80vh] object-contain"
+                            className="max-w-[80vw] max-h-[80vh] object-contain rounded-md"
                             alt="Zoomed request view"
                         />
                     </div>

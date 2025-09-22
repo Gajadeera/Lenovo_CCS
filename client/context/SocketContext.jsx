@@ -33,12 +33,11 @@ export const SocketProvider = ({ children }) => {
             reconnectionDelay: 1000,
             transports: ['websocket'],
             withCredentials: true,
-            autoConnect: false // We'll manually connect after setting up listeners
+            autoConnect: false
         };
 
         const newSocket = io('http://localhost:5000', socketOptions);
 
-        // Connection status handlers
         newSocket.on('connect', () => {
             console.log('Socket connected');
             setConnectionState({
@@ -79,7 +78,6 @@ export const SocketProvider = ({ children }) => {
             });
         });
 
-        // Online users handler
         newSocket.on('onlineUsers', (data) => {
             setOnlineUsers({
                 count: data.count,
@@ -87,7 +85,6 @@ export const SocketProvider = ({ children }) => {
             });
         });
 
-        // Now connect after setting up all listeners
         newSocket.connect();
 
         return newSocket;
@@ -103,8 +100,7 @@ export const SocketProvider = ({ children }) => {
                 newSocket.off('connect');
                 newSocket.off('disconnect');
                 newSocket.off('connect_error');
-                newSocket.off('onlineUsers'); // Clean up onlineUsers listener
-                // newSocket.disconnect();
+                newSocket.off('onlineUsers');
             }
         };
     }, [initializeSocket]);
@@ -149,7 +145,7 @@ export const SocketProvider = ({ children }) => {
         socket,
         connectionState,
         joinedRooms,
-        onlineUsers, // Add onlineUsers to the context value
+        onlineUsers,
         joinRoom,
         leaveRoom,
         subscribe,

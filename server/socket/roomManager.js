@@ -10,10 +10,8 @@ const ROOMS = {
 
 class RoomManager {
     static joinRoleRooms(socket, roles) {
-        // Leave all role rooms first to avoid duplicates
         Object.values(ROOMS).forEach(room => socket.leave(room));
 
-        // Join rooms based on roles
         roles.forEach(role => {
             switch (role.toLowerCase()) {
                 case 'coordinator':

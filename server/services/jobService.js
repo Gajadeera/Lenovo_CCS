@@ -172,8 +172,6 @@ class JobService {
             }
 
             const { customerId, deviceId, otherData } = await this.processJobReferences(bodyData, userId);
-
-            // Auto-assignment logic
             const assignedTechnicianId = otherData.assigned_to ||
                 await this.handleAutoAssignment(otherData.description, otherData.auto_assign);
 
@@ -181,8 +179,6 @@ class JobService {
             const jobStatus = assignedTechnicianId ? 'Assigned' : (otherData.status || 'Pending Assignment');
 
             await this.validateTechnician(assignedTechnicianId);
-
-            // Create job
             const jobNumber = `JOB${(await Counter.getNextSequence('jobNumber')).toString().padStart(3, '0')}`;
             const job = await Job.create({
                 job_number: jobNumber,
@@ -194,8 +190,6 @@ class JobService {
                 created_by: userId,
                 auto_assigned: autoAssigned
             });
-
-            // Handle file uploads
             if (files?.length > 0) {
                 tempFilePaths = files.map(file => file.path);
                 job.attachments = await this.handleJobFileUploads(files, job._id, userId);
@@ -203,11 +197,7 @@ class JobService {
             }
 
             const populatedJob = await this.populateJob(Job.findById(job._id));
-
-            // Create notifications
             const notificationPromises = [];
-
-            // Role-based notification
             notificationPromises.push(this.createNotification({
                 targetRoles: ['manager', 'coordinator'],
                 message: `New job created: ${populatedJob.job_number} by ${userId.name}` +
@@ -223,7 +213,6 @@ class JobService {
                 }
             }));
 
-            // Notification for assigned technician
             if (populatedJob.assigned_to) {
                 notificationPromises.push(this.createNotification({
                     userId: populatedJob.assigned_to._id,
@@ -261,8 +250,6 @@ class JobService {
             }
 
             await Promise.all(notificationPromises);
-
-            // Emit socket events
             const eventData = { userId, job: populatedJob, metadata: { autoAssigned, status: populatedJob.status } };
 
             this.emitSocketEvent('job-created', eventData);
@@ -322,14 +309,10 @@ class JobService {
             const { customer, device, assigned_to, documents_to_delete, ...updateFields } = bodyData;
             const oldValues = { ...job.toObject() };
 
-            // Process references
             const customerId = customer ? (await this.handleReference(customer, Customer, ['name', 'email', 'phone'], userId)).id : job.customer;
             const deviceId = device ? (await this.handleReference(device, Device, ['model_number', 'manufacturer'], userId)).id : job.device;
 
-            // Validate technician
             await this.validateTechnician(assigned_to);
-
-            // Handle file deletions
             if (documents_to_delete) {
                 let docsToDelete = Array.isArray(documents_to_delete) ? documents_to_delete :
                     typeof documents_to_delete === 'string' ? JSON.parse(documents_to_delete) : [documents_to_delete];
@@ -346,14 +329,12 @@ class JobService {
                 }
             }
 
-            // Handle new file uploads
             if (files?.length > 0) {
                 tempFilePaths = files.map(file => file.path);
                 const newAttachments = await this.handleJobFileUploads(files, job._id, userId);
                 job.attachments.push(...newAttachments);
             }
 
-            // Prepare update data
             const updateData = {
                 ...updateFields,
                 customer: customerId,
@@ -363,21 +344,17 @@ class JobService {
                 updated_at: new Date()
             };
 
-            // Handle status change to Closed
             if (updateFields.status === 'Closed' && job.status !== 'Closed') {
                 updateData.completed_date = updateFields.completed_date || new Date();
             }
 
-            // Update job
             const updatedJob = await Job.findByIdAndUpdate(jobId, updateData, { new: true, runValidators: true });
             const populatedJob = await this.populateJob(Job.findById(updatedJob._id));
 
-            // Get changed fields
             const changedFields = Object.keys(updateFields).filter(key =>
                 JSON.stringify(oldValues[key]) !== JSON.stringify(updateFields[key])
             );
 
-            // Create notifications
             const notificationPromises = [
                 this.createNotification({
                     targetRoles: ['manager', 'coordinator'],
@@ -391,7 +368,6 @@ class JobService {
                 })
             ];
 
-            // Notification for assigned technician if changed
             if (assigned_to && String(assigned_to) !== String(job.assigned_to)) {
                 notificationPromises.push(this.createNotification({
                     userId: assigned_to,
@@ -406,7 +382,6 @@ class JobService {
 
             await Promise.all(notificationPromises);
 
-            // Emit socket events
             const eventData = { userId, job: populatedJob, metadata: { changedFields, oldValues } };
 
             this.emitSocketEvent('job-updated', eventData);
@@ -445,19 +420,12 @@ class JobService {
             const job = await this.populateJob(Job.findById(jobId));
             if (!job) throw new ApiError(404, 'Job not found');
 
-            // Delete attachments
             if (job.attachments?.length > 0) {
                 const publicIds = job.attachments.map(a => a.public_id);
                 await cloudinaryService.deleteMultipleFiles(publicIds);
             }
-
-            // Delete folder
             await cloudinaryService.deleteFolder(`Lenovo_CCS/Job_Attachments/${job._id}`);
-
-            // Delete job
-            await Job.findByIdAndDelete(jobId);
-
-            // Create notification
+            await Job.findByIdAndDelete(jobId)
             await this.createNotification({
                 targetRoles: ['manager', 'coordinator'],
                 message: `Job ${job.job_number} deleted by ${userId.name}`,
@@ -468,8 +436,6 @@ class JobService {
                     customer: job.customer?.name || 'Ad-hoc Customer'
                 }
             });
-
-            // Emit socket event
             const eventData = {
                 userId,
                 job: { _id: job._id, job_number: job.job_number, customer: job.customer?.name || 'Ad-hoc Customer' },
@@ -501,8 +467,6 @@ class JobService {
             if (!existingJob) throw new ApiError(404, 'Job not found');
 
             await this.validateTechnician(assigned_to);
-
-            // Prepare update data
             const updateData = {
                 assigned_to,
                 status,
@@ -511,7 +475,6 @@ class JobService {
                 updated_at: new Date()
             };
 
-            // Handle reassignment history
             if (is_reassignment && existingJob.assigned_to) {
                 updateData.previous_assignments = [
                     ...(existingJob.previous_assignments || []),
@@ -522,12 +485,8 @@ class JobService {
                     }
                 ];
             }
-
-            // Update job
             const updatedJob = await Job.findByIdAndUpdate(jobId, updateData, { new: true, runValidators: true });
             const populatedJob = await this.populateJob(Job.findById(updatedJob._id));
-
-            // Create notifications
             const notificationPromises = [
                 this.createNotification({
                     targetRoles: ['manager', 'coordinator'],
@@ -552,7 +511,6 @@ class JobService {
                 })
             ];
 
-            // Notification for previous technician if reassignment
             if (is_reassignment && existingJob.assigned_to) {
                 notificationPromises.push(this.createNotification({
                     userId: existingJob.assigned_to,
@@ -567,7 +525,6 @@ class JobService {
 
             await Promise.all(notificationPromises);
 
-            // Emit socket events
             const eventData = { userId, job: populatedJob, metadata: { isReassignment: is_reassignment, previousTechnician: existingJob.assigned_to?.name } };
 
             this.emitSocketEvent('job-assigned', eventData, { type: 'role', roles: ['manager', 'coordinator'] });
@@ -594,21 +551,14 @@ class JobService {
             if (!job) throw new ApiError(404, 'Job not found');
 
             const oldStatus = job.status;
-
-            // Prepare update data
             const updateData = { status, updated_at: new Date() };
             if (warranty_status) updateData.warranty_status = warranty_status;
-
-            // Set completed date if closing
             if (status === 'Closed' && job.status !== 'Closed') {
                 updateData.completed_date = new Date();
             }
 
-            // Update job
             const updatedJob = await Job.findByIdAndUpdate(jobId, updateData, { new: true, runValidators: true });
             const populatedJob = await this.populateJob(Job.findById(updatedJob._id));
-
-            // Create notifications
             const notificationPromises = [
                 this.createNotification({
                     targetRoles: ['manager', 'coordinator'],
@@ -622,8 +572,6 @@ class JobService {
                     }
                 })
             ];
-
-            // Notification for assigned technician
             if (populatedJob.assigned_to) {
                 notificationPromises.push(this.createNotification({
                     userId: populatedJob.assigned_to._id,
@@ -638,7 +586,6 @@ class JobService {
                 }));
             }
 
-            // Special notifications for closed jobs
             if (populatedJob.status === 'Closed') {
                 notificationPromises.push(this.createNotification({
                     targetRoles: ['manager'],
@@ -666,7 +613,6 @@ class JobService {
 
             await Promise.all(notificationPromises);
 
-            // Emit socket events
             const eventData = { userId, job: populatedJob, metadata: { oldStatus, newStatus: populatedJob.status } };
 
             this.emitSocketEvent('job-status-changed', eventData, { type: 'role', roles: ['manager', 'coordinator'] });
@@ -697,7 +643,6 @@ class JobService {
         try {
             const { job_number, serial_number, status, priority, job_type, assigned_to, created_at, warranty_status, page = 1, limit = 10, all = false } = filters;
 
-            // Build filter object
             const filter = {};
 
             if (job_number) filter.job_number = { $regex: job_number, $options: 'i' };
@@ -707,7 +652,6 @@ class JobService {
             if (job_type) filter.job_type = job_type;
             if (warranty_status) filter.warranty_status = warranty_status;
 
-            // Handle assigned_to filter
             if (assigned_to) {
                 if (mongoose.Types.ObjectId.isValid(assigned_to)) {
                     filter.assigned_to = assigned_to;
@@ -720,7 +664,6 @@ class JobService {
                 }
             }
 
-            // Handle date filtering
             if (created_at) {
                 const startDate = new Date(created_at);
                 startDate.setHours(0, 0, 0, 0);
@@ -729,10 +672,8 @@ class JobService {
                 filter.created_at = { $gte: startDate, $lte: endDate };
             }
 
-            // Get total count
             const totalCount = await Job.countDocuments(filter);
 
-            // Handle "all" flag
             if (all === 'true') {
                 const allJobs = await this.populateJob(Job.find(filter)).sort({ created_at: -1 }).lean();
                 return {
@@ -743,7 +684,6 @@ class JobService {
                 };
             }
 
-            // Apply pagination
             const pageNum = Math.max(1, parseInt(page));
             const limitNum = Math.max(1, parseInt(limit));
 
@@ -785,7 +725,6 @@ class JobService {
         try {
             if (!technicianId) throw new ApiError(400, 'Technician ID is required');
 
-            // Verify the technician exists
             const technician = await User.findById(technicianId);
             if (!technician) throw new ApiError(404, 'Technician not found');
 

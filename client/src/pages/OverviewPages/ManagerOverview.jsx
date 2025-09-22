@@ -1,4 +1,3 @@
-// Updated ManagerOverview component with consistent dark mode text colors
 import React, { useState, useEffect } from 'react';
 import { FiBriefcase, FiUsers, FiPackage, FiClock } from 'react-icons/fi';
 import axios from 'axios';
@@ -13,7 +12,6 @@ const ManagerOverview = ({ connectionStatus, onlineUsers, onlineUsersList }) => 
     const { user: currentUser } = useAuth();
     const { isDark } = useDarkMode();
 
-    // State for all modals
     const [modalStates, setModalStates] = useState({
         createJob: false,
         assignJob: false,
@@ -35,7 +33,6 @@ const ManagerOverview = ({ connectionStatus, onlineUsers, onlineUsersList }) => 
         loading: true
     });
 
-    // Modal handlers
     const openModal = (modalName) => {
         setModalStates(prev => ({ ...prev, [modalName]: true }));
     };
@@ -47,7 +44,6 @@ const ManagerOverview = ({ connectionStatus, onlineUsers, onlineUsersList }) => 
     const handleCreateJob = () => openModal('createJob');
     const handleAssignJob = () => openModal('assignJob');
 
-    // Improved date normalization function
     const normalizeDate = (date) => {
         if (!date) return new Date(NaN);
         const d = new Date(date);
@@ -75,10 +71,8 @@ const ManagerOverview = ({ connectionStatus, onlineUsers, onlineUsersList }) => 
                 })
             ]);
 
-            // Get today's date normalized
             const today = normalizeDate(new Date());
 
-            // Calculate new jobs created today
             const newJobs = jobsRes.data?.data?.filter(job => {
                 if (!job.createdAt) return false;
                 const jobDate = normalizeDate(job.createdAt);
@@ -115,7 +109,6 @@ const ManagerOverview = ({ connectionStatus, onlineUsers, onlineUsersList }) => 
             const jobs = jobsRes.data?.data || [];
             const partsRequests = partsRes.data?.data || [];
 
-            // Process job trends data (last 7 days)
             const today = normalizeDate(new Date());
             const jobTrends = Array.from({ length: 7 }, (_, i) => {
                 const date = new Date(today);
@@ -136,7 +129,6 @@ const ManagerOverview = ({ connectionStatus, onlineUsers, onlineUsersList }) => 
                 };
             });
 
-            // Process job status distribution
             const statusCounts = {};
             jobs.forEach(job => {
                 if (job.status) {
@@ -148,7 +140,6 @@ const ManagerOverview = ({ connectionStatus, onlineUsers, onlineUsersList }) => 
                 value
             }));
 
-            // Process parts status distribution
             const partsStatusCounts = {};
             partsRequests.forEach(request => {
                 if (request.status) {
@@ -194,14 +185,12 @@ const ManagerOverview = ({ connectionStatus, onlineUsers, onlineUsersList }) => 
 
     return (
         <div className={`p-4 space-y-6 ${isDark ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-800'} min-h-screen`}>
-            {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-[#1E4065]'}`}>
                     Manager Dashboard
                 </h2>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <StatCard
                     icon={FiBriefcase}
@@ -237,7 +226,6 @@ const ManagerOverview = ({ connectionStatus, onlineUsers, onlineUsersList }) => 
                 />
             </div>
 
-            {/* Analytics Charts */}
             <BaseAnalytics
                 title="Analytics Overview"
                 data={analytics}

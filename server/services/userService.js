@@ -107,7 +107,8 @@ class UserService {
     }
 
     static async signup(userData, file, currentUser) {
-        const { name, email, password, role, phone } = userData;
+        const { name, email, password, role, phone, skills } = userData;
+        console.log('Signup data received:', userData);
 
         if (!validator.isEmail(email)) throw new ApiError(400, 'Invalid email format');
         if (password.length < 6) throw new ApiError(400, 'Password must be at least 6 characters');
@@ -116,12 +117,27 @@ class UserService {
         const validRoles = ['coordinator', 'technician', 'manager', 'parts_team', 'administrator'];
         if (!validRoles.includes(role)) throw new ApiError(400, 'Invalid user role');
 
+        let parsedSkills = [];
+        if (skills) {
+            try {
+                parsedSkills = typeof skills === "string" ? JSON.parse(skills) : skills;
+                console.log('Parsed skills:', parsedSkills); // Add this debug log
+            } catch (err) {
+                console.error('Skills parsing error:', err);
+                throw new ApiError(400, 'Invalid skills format');
+            }
+        }
+
         const user = await User.create({
             name,
             email,
             password,
             role,
             phone: phone || null,
+            skills: parsedSkills.map(s => ({
+                name: s.name,
+                subskills: (s.subskills || []).filter(sub => sub && sub.trim() !== '')
+            })),
             image: {
                 url: 'https://res.cloudinary.com/demo/image/upload/v1626282931/sample.jpg',
                 public_id: 'default_public_id'
@@ -130,6 +146,8 @@ class UserService {
             updated_at: new Date()
         });
 
+        console.log('New user created:', user);
+
         if (file) {
             user.image = await this.handleImageUpload(file, user._id);
             await user.save();
@@ -137,7 +155,6 @@ class UserService {
 
         const authResponse = this.generateAuthResponse(user);
 
-        // Create role-based notification for admins
         await this.createUserNotification(
             { roles: ['administrator', 'manager'] },
             `New user account created for ${user.name} (${user.role})`,
@@ -150,7 +167,6 @@ class UserService {
             user._id
         );
 
-        // Emit event to admins and managers
         const eventData = {
             eventId: new mongoose.Types.ObjectId().toString(),
             timestamp: new Date(),
@@ -201,7 +217,6 @@ class UserService {
             user._id
         );
 
-        // Emit login event
         const eventData = {
             eventId: new mongoose.Types.ObjectId().toString(),
             timestamp: new Date(),
@@ -231,8 +246,6 @@ class UserService {
 
         const oldValues = { ...user.toObject() };
         const removeImage = updateData.removeImage;
-
-        // Handle image removal
         if (removeImage === 'true' || removeImage === true) {
             await this.cleanupImage(user);
             user.image = {
@@ -240,19 +253,15 @@ class UserService {
                 public_id: 'default_public_id'
             };
         }
-        // Handle new image upload
         else if (file) {
             await this.cleanupImage(user);
             user.image = await this.handleImageUpload(file, user._id, true);
         }
-
-        // Update fields
         if (updateData.name !== undefined) user.name = updateData.name;
         if (updateData.phone !== undefined) user.phone = updateData.phone;
 
         await user.save();
 
-        // Get changed fields
         const changedFields = [];
         if (updateData.name !== undefined && updateData.name !== oldValues.name) {
             changedFields.push('name');
@@ -264,7 +273,6 @@ class UserService {
             changedFields.push('image');
         }
 
-        // Create notification
         await this.createUserNotification(
             { userId: user._id },
             'Your profile has been updated successfully',
@@ -277,7 +285,6 @@ class UserService {
             user._id
         );
 
-        // Emit event
         const eventData = {
             eventId: new mongoose.Types.ObjectId().toString(),
             timestamp: new Date(),
@@ -341,7 +348,19 @@ class UserService {
 
         const oldValues = user.toObject();
 
-        // Handle image operations
+        let parsedSkills = [];
+        if (updateData.skills) {
+            try {
+                parsedSkills = typeof updateData.skills === "string"
+                    ? JSON.parse(updateData.skills)
+                    : updateData.skills;
+                console.log('Parsed skills for update:', parsedSkills);
+            } catch (err) {
+                console.error('Skills parsing error:', err);
+                throw new ApiError(400, 'Invalid skills format');
+            }
+        }
+
         if (updateData.removeImage === 'true' || updateData.removeImage === true) {
             await this.cleanupImage(user);
             user.image = {
@@ -359,6 +378,12 @@ class UserService {
             phone: updateData.phone,
             role: updateData.role,
             ...(updateData.password && { password: updateData.password }),
+            ...(updateData.skills && {
+                skills: parsedSkills.map(s => ({
+                    name: s.name,
+                    subskills: (s.subskills || []).filter(sub => sub && sub.trim() !== '')
+                }))
+            }),
             updated_at: new Date()
         };
 
@@ -368,12 +393,13 @@ class UserService {
         const userObject = user.toObject();
         delete userObject.password;
 
-        // Get changed fields
         const changedFields = Object.keys(updates).filter(key => {
+            if (key === 'skills') {
+                return JSON.stringify(oldValues[key] || []) !== JSON.stringify(updates[key] || []);
+            }
             return JSON.stringify(oldValues[key]) !== JSON.stringify(updates[key]);
         });
 
-        // Create notifications
         await this.createUserNotification(
             { userId: user._id },
             `Your profile was updated by ${currentUser.name}`,
@@ -399,7 +425,6 @@ class UserService {
             user._id
         );
 
-        // Emit event
         const eventData = {
             eventId: new mongoose.Types.ObjectId().toString(),
             timestamp: new Date(),
@@ -434,8 +459,6 @@ class UserService {
         };
 
         await User.findByIdAndDelete(userId);
-
-        // Create notification
         await this.createUserNotification(
             { roles: ['administrator', 'manager'] },
             `User account deleted: ${user.name} (${user.role}) by ${currentUser.name}`,
@@ -449,7 +472,6 @@ class UserService {
             user._id
         );
 
-        // Emit event
         const eventData = {
             eventId: new mongoose.Types.ObjectId().toString(),
             timestamp: new Date(),
@@ -480,7 +502,6 @@ class UserService {
             newLast24Hours: newUsers
         };
 
-        // Emit stats update
         await this.emitUserEvent('user-stats-updated', stats, ['administrator', 'manager']);
 
         return stats;
@@ -494,7 +515,6 @@ class UserService {
             { $project: { name: 1, email: 1, role: 1, last_login: 1 } }
         ]);
 
-        // Emit activity update
         await this.emitUserEvent('user-activity-updated', activities, ['administrator']);
 
         return activities;
@@ -506,7 +526,6 @@ class UserService {
             { $project: { role: '$_id', count: 1, _id: 0 } }
         ]);
 
-        // Emit distribution update
         await this.emitUserEvent('role-distribution-updated', distribution, ['administrator', 'manager']);
 
         return distribution;
@@ -522,7 +541,7 @@ class UserService {
             case 'monthly':
                 groupBy = { $dateToString: { format: '%Y-%m', date: '$created_at' } };
                 break;
-            default: // weekly
+            default:
                 groupBy = { $dateToString: { format: '%Y-%U', date: '$created_at' } };
         }
 
@@ -549,8 +568,6 @@ class UserService {
             period,
             data: growth
         };
-
-        // Emit growth update
         await this.emitUserEvent('user-growth-updated', result, ['administrator']);
 
         return growth;

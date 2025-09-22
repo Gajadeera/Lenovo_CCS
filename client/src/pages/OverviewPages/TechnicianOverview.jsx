@@ -51,7 +51,6 @@ const TechnicianOverview = ({ technicianId }) => {
                     loading: false
                 });
 
-                // Get only 5 most recent jobs and parts requests
                 const sortedJobs = [...jobs]
                     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                     .slice(0, 5);
@@ -125,7 +124,6 @@ const TechnicianOverview = ({ technicianId }) => {
 
     return (
         <div className={`p-4 space-y-6 ${isDark ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-800'} min-h-screen`}>
-            {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-[#1E4065]'}`}>
@@ -137,7 +135,6 @@ const TechnicianOverview = ({ technicianId }) => {
                 </div>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <StatCard
                     icon={FiTool}
@@ -173,9 +170,7 @@ const TechnicianOverview = ({ technicianId }) => {
                 />
             </div>
 
-            {/* Recent Activity - Compact Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Recent Jobs */}
                 <div className={`p-3 rounded-lg shadow-sm border ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-100'}`}>
                     <div className="flex justify-between items-center mb-3">
                         <h3 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-[#1E4065]'}`}>
@@ -230,7 +225,6 @@ const TechnicianOverview = ({ technicianId }) => {
                     </div>
                 </div>
 
-                {/* Recent Parts Requests */}
                 <div className={`p-3 rounded-lg shadow-sm border ${isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-100'}`}>
                     <div className="flex justify-between items-center mb-3">
                         <h3 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-[#1E4065]'}`}>

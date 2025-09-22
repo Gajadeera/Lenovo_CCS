@@ -1,4 +1,3 @@
-// contexts/AllSocketProviders.jsx
 import React from 'react';
 import { SocketProvider } from './SocketContext';
 import { DeviceSocketProvider } from './DeviceSocketContext';

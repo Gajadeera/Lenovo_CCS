@@ -2,7 +2,6 @@ import React from 'react';
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from 'react-icons/fi';
 
 const Pagination = ({ currentPage, totalPages, onPageChange, maxVisiblePages = 5 }) => {
-    // Calculate range of pages to show
     const getPageRange = () => {
         if (totalPages <= 1) return [];
 
@@ -10,7 +9,6 @@ const Pagination = ({ currentPage, totalPages, onPageChange, maxVisiblePages = 5
         let start = Math.max(currentPage - half, 1);
         let end = Math.min(start + maxVisiblePages - 1, totalPages);
 
-        // Adjust if we're near the end
         if (end - start + 1 < maxVisiblePages) {
             start = Math.max(end - maxVisiblePages + 1, 1);
         }
@@ -29,8 +27,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange, maxVisiblePages = 5
                     onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
                     className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${currentPage === 1
-                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed'
-                            : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed'
+                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                         }`}
                 >
                     Previous
@@ -39,8 +37,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange, maxVisiblePages = 5
                     onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage === totalPages}
                     className={`ml-3 relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${currentPage === totalPages
-                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed'
-                            : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed'
+                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                         }`}
                 >
                     Next
@@ -57,33 +55,29 @@ const Pagination = ({ currentPage, totalPages, onPageChange, maxVisiblePages = 5
 
                 <div>
                     <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {/* First page button */}
                         <button
                             onClick={() => onPageChange(1)}
                             disabled={currentPage === 1}
                             className={`relative inline-flex items-center px-2 py-2 rounded-l-md border text-sm font-medium ${currentPage === 1
-                                    ? 'bg-white dark:bg-gray-700 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 cursor-not-allowed'
-                                    : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                ? 'bg-white dark:bg-gray-700 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 cursor-not-allowed'
+                                : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                                 }`}
                         >
                             <span className="sr-only">First</span>
                             <FiChevronsLeft className="h-5 w-5" aria-hidden="true" />
                         </button>
 
-                        {/* Previous page button */}
                         <button
                             onClick={() => onPageChange(currentPage - 1)}
                             disabled={currentPage === 1}
                             className={`relative inline-flex items-center px-2 py-2 border text-sm font-medium ${currentPage === 1
-                                    ? 'bg-white dark:bg-gray-700 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 cursor-not-allowed'
-                                    : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                ? 'bg-white dark:bg-gray-700 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 cursor-not-allowed'
+                                : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                                 }`}
                         >
                             <span className="sr-only">Previous</span>
                             <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
                         </button>
-
-                        {/* Page numbers */}
                         {pageRange[0] > 1 && (
                             <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300">
                                 ...
@@ -95,8 +89,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange, maxVisiblePages = 5
                                 key={page}
                                 onClick={() => onPageChange(page)}
                                 className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${page === currentPage
-                                        ? 'z-10 bg-blue-50 dark:bg-blue-900/30 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300'
-                                        : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                    ? 'z-10 bg-blue-50 dark:bg-blue-900/30 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300'
+                                    : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
                                     }`}
                             >
                                 {page}
@@ -109,26 +103,25 @@ const Pagination = ({ currentPage, totalPages, onPageChange, maxVisiblePages = 5
                             </span>
                         )}
 
-                        {/* Next page button */}
+
                         <button
                             onClick={() => onPageChange(currentPage + 1)}
                             disabled={currentPage === totalPages}
                             className={`relative inline-flex items-center px-2 py-2 border text-sm font-medium ${currentPage === totalPages
-                                    ? 'bg-white dark:bg-gray-700 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 cursor-not-allowed'
-                                    : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                ? 'bg-white dark:bg-gray-700 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 cursor-not-allowed'
+                                : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                                 }`}
                         >
                             <span className="sr-only">Next</span>
                             <FiChevronRight className="h-5 w-5" aria-hidden="true" />
                         </button>
 
-                        {/* Last page button */}
                         <button
                             onClick={() => onPageChange(totalPages)}
                             disabled={currentPage === totalPages}
                             className={`relative inline-flex items-center px-2 py-2 rounded-r-md border text-sm font-medium ${currentPage === totalPages
-                                    ? 'bg-white dark:bg-gray-700 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 cursor-not-allowed'
-                                    : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                ? 'bg-white dark:bg-gray-700 text-gray-300 dark:text-gray-600 border-gray-300 dark:border-gray-600 cursor-not-allowed'
+                                : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                                 }`}
                         >
                             <span className="sr-only">Last</span>

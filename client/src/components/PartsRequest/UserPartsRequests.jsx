@@ -27,8 +27,6 @@ const UserPartsRequests = () => {
         status: '',
         urgency: ''
     });
-
-    // Safe date parsing function
     const safeParseISO = (dateString) => {
         if (!dateString) return null;
         try {
@@ -40,13 +38,11 @@ const UserPartsRequests = () => {
         }
     };
 
-    // Format date safely
     const safeFormatDate = (dateString, formatString = 'MM/dd/yyyy') => {
         const date = safeParseISO(dateString);
         return date ? format(date, formatString) : 'N/A';
     };
 
-    // Fetch initial data (jobs)
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
@@ -65,7 +61,6 @@ const UserPartsRequests = () => {
         }
     }, [currentUser]);
 
-    // Fetch requests with filters (only for current user)
     useEffect(() => {
         const fetchRequests = async () => {
             try {
@@ -77,7 +72,7 @@ const UserPartsRequests = () => {
                     params: {
                         page,
                         limit,
-                        requested_by: currentUser._id, // Only show requests for current user
+                        requested_by: currentUser._id,
                         ...Object.fromEntries(
                             Object.entries(filters)
                                 .filter(([_, value]) => value !== '')

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiPlus } from 'react-icons/fi';
+import { FiPlus, FiFilter } from 'react-icons/fi';
 import axios from 'axios';
 import { useAuth } from '../../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -9,14 +9,12 @@ import CreateIssue from '../../components/Issues/CreateIssue';
 import SingleIssueModal from '../../components/Issues/SingleIssue';
 import { format, parseISO, isValid } from 'date-fns';
 import Button from '../../components/Common/Button';
+import FilterModal from '../../components/Common/FilterModal';
 
 const AllIssues = () => {
     const [issues, setIssues] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [page, setPage] = useState(1);
-    const [limit] = useState(5);
-    const [totalCount, setTotalCount] = useState(0);
     const [users, setUsers] = useState([]);
     const [filters, setFilters] = useState({
         title: '',
@@ -29,12 +27,21 @@ const AllIssues = () => {
     const navigate = useNavigate();
     const { socket } = useSocket();
     const [showCreateIssueModal, setShowCreateIssueModal] = useState(false);
+    const [showFilterModal, setShowFilterModal] = useState(false);
     const [selectedIssue, setSelectedIssue] = useState(null);
 
-    // Permission checks
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(5);
+    const [totalCount, setTotalCount] = useState(0);
+
+    const calculateLimit = (issueCount) => {
+        return issueCount <= 5 ? issueCount : 5;
+    };
+
     const canCreateIssues = ['administrator', 'manager', 'coordinator'].includes(currentUser?.role);
 
-    // Safe date parsing function
+    const hasActiveFilters = Object.values(filters).some(value => value !== '');
+
     const safeParseISO = (dateString) => {
         if (!dateString) return null;
         try {
@@ -46,13 +53,11 @@ const AllIssues = () => {
         }
     };
 
-    // Format date safely
     const safeFormatDate = (dateString, formatString = 'MM/dd/yyyy') => {
         const date = safeParseISO(dateString);
         return date ? format(date, formatString) : 'N/A';
     };
 
-    // Fetch initial data (users)
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -62,7 +67,6 @@ const AllIssues = () => {
                 setUsers(response.data?.users || []);
             } catch (err) {
                 console.error('Error fetching users:', err);
-                setError(err.response?.data?.message || err.message || 'Failed to fetch users');
             }
         };
 
@@ -71,7 +75,6 @@ const AllIssues = () => {
         }
     }, [currentUser]);
 
-    // Socket event listeners
     useEffect(() => {
         if (!socket) return;
 
@@ -87,6 +90,7 @@ const AllIssues = () => {
         const handleNewIssue = (newIssue) => {
             setIssues(prev => [newIssue, ...prev]);
             setTotalCount(prev => prev + 1);
+            setLimit(calculateLimit(totalCount + 1));
         };
 
         const handleIssueDeleted = (deletedIssueId) => {
@@ -95,6 +99,7 @@ const AllIssues = () => {
                 setSelectedIssue(null);
             }
             setTotalCount(prev => prev - 1);
+            setLimit(calculateLimit(totalCount - 1));
         };
 
         socket.on('issue:updated', handleIssueUpdate);
@@ -106,9 +111,8 @@ const AllIssues = () => {
             socket.off('issue:created', handleNewIssue);
             socket.off('issue:deleted', handleIssueDeleted);
         };
-    }, [socket, selectedIssue]);
+    }, [socket, selectedIssue, totalCount]);
 
-    // Fetch issues with filters
     useEffect(() => {
         const fetchIssues = async () => {
             try {
@@ -118,8 +122,7 @@ const AllIssues = () => {
                         Authorization: `Bearer ${currentUser?.token}`
                     },
                     params: {
-                        page,
-                        limit,
+                        all: true,
                         ...Object.fromEntries(
                             Object.entries(filters)
                                 .filter(([_, value]) => value !== '')
@@ -128,15 +131,11 @@ const AllIssues = () => {
                 };
 
                 const response = await axios.get('http://localhost:5000/system-issues', config);
-
-                // Handle both array and paginated response structures
                 const issuesData = response.data.data || response.data.issues || response.data || [];
                 const total = response.data.pagination?.total ||
                     response.data.totalCount ||
                     response.data.total ||
                     issuesData.length;
-
-                // Add validation logic that was missing
                 const validatedIssues = issuesData.map(issue => ({
                     ...issue,
                     created_at: issue.created_at || null,
@@ -146,6 +145,7 @@ const AllIssues = () => {
 
                 setIssues(validatedIssues);
                 setTotalCount(total);
+                setLimit(calculateLimit(total));
                 setError(null);
             } catch (err) {
                 console.error('Error fetching issues:', err);
@@ -161,7 +161,26 @@ const AllIssues = () => {
         if (currentUser?.token) {
             fetchIssues();
         }
-    }, [currentUser, page, limit, filters, navigate]);
+    }, [currentUser, filters, navigate]);
+
+    const filteredIssues = React.useMemo(() => {
+        const { title, status, priority, category, assigned_to } = filters;
+        const titleLower = title.toLowerCase();
+
+        return issues
+            .filter(issue => {
+                return (!title || issue.title.toLowerCase().includes(titleLower)) &&
+                    (!status || issue.status === status) &&
+                    (!priority || issue.priority === priority) &&
+                    (!category || issue.category === category) &&
+                    (!assigned_to || issue.assigned_to?._id === assigned_to);
+            })
+            .sort((a, b) => {
+                const aDate = a.created_at ? new Date(a.created_at) : 0;
+                const bDate = b.created_at ? new Date(b.created_at) : 0;
+                return bDate - aDate;
+            });
+    }, [issues, filters]);
 
     const handleRowClick = (issue) => {
         setSelectedIssue(issue);
@@ -171,6 +190,7 @@ const AllIssues = () => {
         setIssues(prev => [newIssue, ...prev]);
         setShowCreateIssueModal(false);
         setTotalCount(prev => prev + 1);
+        setLimit(calculateLimit(totalCount + 1));
     };
 
     const handlePageChange = (newPage) => {
@@ -194,6 +214,12 @@ const AllIssues = () => {
         });
         setPage(1);
     };
+
+    const paginatedIssues = React.useMemo(() => {
+        return totalCount <= 5
+            ? filteredIssues
+            : filteredIssues.slice((page - 1) * limit, page * limit);
+    }, [filteredIssues, page, limit, totalCount]);
 
     const getPriorityColor = (priority) => {
         switch (priority) {
@@ -281,29 +307,25 @@ const AllIssues = () => {
             key: 'title',
             header: 'Title',
             accessor: (issue) => (
-                <span className="text-[#1E4065] font-medium">
+                <span className="text-gray-800 dark:text-gray-200 font-medium">
                     {issue.title}
                 </span>
-            ),
-            sortable: true
+            )
         },
         {
             key: 'reported_by',
             header: 'Reported By',
-            accessor: (issue) => issue.reported_by?.name || 'System',
-            sortable: true
+            accessor: (issue) => issue.reported_by?.name || 'System'
         },
         {
             key: 'assigned_to',
             header: 'Assigned To',
-            accessor: (issue) => issue.assigned_to?.name || 'Unassigned',
-            sortable: true
+            accessor: (issue) => issue.assigned_to?.name || 'Unassigned'
         },
         {
             key: 'category',
             header: 'Category',
-            accessor: (issue) => issue.category || 'Other',
-            sortable: true
+            accessor: (issue) => issue.category || 'Other'
         },
         {
             key: 'priority',
@@ -312,8 +334,7 @@ const AllIssues = () => {
                 <span className={`capitalize font-semibold ${getPriorityColor(issue.priority)}`}>
                     {issue.priority || 'Not Set'}
                 </span>
-            ),
-            sortable: true
+            )
         },
         {
             key: 'status',
@@ -322,23 +343,35 @@ const AllIssues = () => {
                 <span className={`capitalize font-semibold ${getStatusColor(issue.status)}`}>
                     {issue.status || 'Open'}
                 </span>
-            ),
-            sortable: true
+            )
         },
         {
             key: 'created_at',
             header: 'Created',
-            accessor: (issue) => safeFormatDate(issue.created_at),
-            sortable: true
+            accessor: (issue) => safeFormatDate(issue.created_at)
         }
     ];
 
     return (
-        <div className="px-4 py-6 relative">
-            {/* Main Content */}
-            <div >
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">System Issues</h1>
+        <div className="px-4 py-6">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold text-gray-800">System Issues</h1>
+                <div className="flex space-x-3">
+                    <Button
+                        onClick={() => setShowFilterModal(true)}
+                        leftIcon={<FiFilter />}
+                        size="md"
+                        variant="outline"
+                        className={hasActiveFilters ? 'border-blue-500 text-blue-500' : ''}
+                    >
+                        Filters
+                        {hasActiveFilters && (
+                            <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-blue-500 rounded-full">
+                                Active
+                            </span>
+                        )}
+                    </Button>
+
                     {canCreateIssues && (
                         <Button
                             onClick={() => setShowCreateIssueModal(true)}
@@ -349,33 +382,38 @@ const AllIssues = () => {
                         </Button>
                     )}
                 </div>
-
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-                        {error}
-                    </div>
-                )}
-
-                <DataTable
-                    data={issues}
-                    columns={columns}
-                    loading={loading}
-                    page={page}
-                    limit={limit}
-                    totalCount={totalCount}
-                    onPageChange={handlePageChange}
-                    onRowClick={handleRowClick}
-                    rowClassName="cursor-pointer hover:bg-[#e6f7ff]"
-                    headerClassName="bg-[#1E4065] text-white"
-                    filters={filterConfig}
-                    onFilterChange={handleFilterChange}
-                    onClearFilters={handleClearFilters}
-                    emptyStateMessage="No issues found"
-                    loadingMessage="Loading issues..."
-                />
             </div>
 
-            {/* Modals - rendered in portal to prevent z-index issues */}
+            {error && (
+                <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+                    {error}
+                </div>
+            )}
+
+
+            <DataTable
+                data={paginatedIssues}
+                columns={columns}
+                loading={loading}
+                page={page}
+                limit={limit}
+                totalCount={filteredIssues.length}
+                onPageChange={handlePageChange}
+                onRowClick={handleRowClick}
+                rowClassName="cursor-pointer hover:bg-[#e6f7ff]"
+                headerClassName="bg-[#1E4065] text-white"
+                emptyStateMessage="No issues found"
+                loadingMessage="Loading issues..."
+                error={error ? { message: error } : null}
+            />
+            <FilterModal
+                isOpen={showFilterModal}
+                onClose={() => setShowFilterModal(false)}
+                filters={filterConfig}
+                onFilterChange={handleFilterChange}
+                onClearFilters={handleClearFilters}
+                title="Filter Issues"
+            />
             {showCreateIssueModal && (
                 <CreateIssue
                     isOpen={showCreateIssueModal}
@@ -385,13 +423,13 @@ const AllIssues = () => {
                     currentUser={currentUser}
                 />
             )}
+
             {selectedIssue && (
                 <SingleIssueModal
                     isOpen={!!selectedIssue}
                     onClose={() => setSelectedIssue(null)}
                     issueId={selectedIssue._id}
                     onIssueUpdate={(updatedIssue) => {
-                        // Add null check here
                         if (!updatedIssue) {
                             setSelectedIssue(null);
                             return;
@@ -405,6 +443,7 @@ const AllIssues = () => {
                         setIssues(prev => prev.filter(issue => issue._id !== deletedIssueId));
                         setSelectedIssue(null);
                         setTotalCount(prev => prev - 1);
+                        setLimit(calculateLimit(totalCount - 1));
                     }}
                 />
             )}

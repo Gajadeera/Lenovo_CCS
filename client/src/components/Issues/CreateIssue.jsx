@@ -52,7 +52,6 @@ const CreateIssueModal = ({ isOpen, onClose, onCreateIssue }) => {
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
         if (files.length > 0) {
-            // Validate files
             const validFiles = files.filter(file => {
                 if (!file.type.startsWith('image/')) {
                     setError('Please upload only image files');

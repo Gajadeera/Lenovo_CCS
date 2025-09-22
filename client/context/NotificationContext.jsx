@@ -1,4 +1,3 @@
-// contexts/NotificationContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useSocket } from './SocketContext';
 import { useDeviceSocket } from './DeviceSocketContext';
@@ -13,8 +12,6 @@ const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
     const [allNotifications, setAllNotifications] = useState([]);
-
-    // Get notifications from all socket contexts
     const deviceNotifications = useDeviceSocket()?.deviceNotifications || [];
     const jobNotifications = useJobSocket()?.jobNotifications || [];
     const partsNotifications = usePartsRequestSocket()?.partsRequestNotifications || [];
@@ -23,7 +20,6 @@ export const NotificationProvider = ({ children }) => {
     const issueNotifications = useIssueSocket()?.issueNotifications || [];
     const customerNotifications = useCustomerSocket()?.customerNotifications || [];
 
-    // Combine all notifications
     useEffect(() => {
         const combined = [
             ...deviceNotifications,
@@ -51,12 +47,10 @@ export const NotificationProvider = ({ children }) => {
     };
 
     const markAsRead = (id) => {
-        // This would need to be implemented in each individual socket context
         console.log('Mark as read not implemented for all contexts yet');
     };
 
     const markAllAsRead = () => {
-        // This would need to be implemented in each individual socket context
         console.log('Mark all as read not implemented for all contexts yet');
     };
 

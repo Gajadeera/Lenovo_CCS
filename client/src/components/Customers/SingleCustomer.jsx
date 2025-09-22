@@ -171,7 +171,6 @@ const ViewCustomerModal = ({ isOpen, onClose, customerId }) => {
                 </div>
             </Modal>
 
-            {/* Edit Customer Modal */}
             <EditCustomerModal
                 isOpen={showEditModal}
                 onClose={handleEditModalClose}
@@ -180,7 +179,6 @@ const ViewCustomerModal = ({ isOpen, onClose, customerId }) => {
                 onCustomerUpdated={handleCustomerUpdated}
             />
 
-            {/* Delete Customer Modal */}
             <DeleteCustomerModal
                 isOpen={showDeleteModal}
                 onClose={handleDeleteModalClose}

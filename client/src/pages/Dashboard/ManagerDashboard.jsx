@@ -42,7 +42,6 @@ const ManagerDashboard = () => {
     const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
     const prevOnlineUsersRef = useRef([]);
 
-    // Filter notifications to only show those meant for current user
     const filterNotifications = (notifications) => {
         if (!notifications) return [];
         return notifications.filter(notification =>
@@ -52,7 +51,6 @@ const ManagerDashboard = () => {
             ));
     };
 
-    // Combine all filtered notifications
     const allNotifications = [
         ...filterNotifications(jobNotifications),
         ...filterNotifications(deviceNotifications),
@@ -61,7 +59,6 @@ const ManagerDashboard = () => {
         ...filterNotifications(customerNotifications)
     ];
 
-    // Handle online users changes
     useEffect(() => {
         const newUsers = onlineUsersList.filter(user =>
             !prevOnlineUsersRef.current.some(u => u.userId === user.userId)
@@ -78,7 +75,6 @@ const ManagerDashboard = () => {
         prevOnlineUsersRef.current = onlineUsersList;
     }, [onlineUsersList, currentUser?._id]);
 
-    // Join necessary rooms when connected
     useEffect(() => {
         if (!isConnected || !currentUser?._id) return;
 
@@ -98,7 +94,6 @@ const ManagerDashboard = () => {
         joinRooms();
 
         return () => {
-            // Rooms will be automatically cleaned up by SocketProvider on disconnect
         };
     }, [isConnected, currentUser, joinRoom]);
 
@@ -106,7 +101,6 @@ const ManagerDashboard = () => {
 
     const clearNotification = async (notificationId) => {
         try {
-            // Clear from appropriate real-time notification context
             if (notificationId.startsWith('job-')) {
                 clearJobNotification(notificationId);
             } else if (notificationId.startsWith('device-')) {

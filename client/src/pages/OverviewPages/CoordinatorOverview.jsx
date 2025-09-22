@@ -32,7 +32,6 @@ const CoordinatorOverview = () => {
     const handleGenerateReport = () => toast('Generate report functionality', { icon: '📊' });
     const handleCustomerManagement = () => toast('Customer management functionality', { icon: '👤' });
 
-    // Improved date normalization function
     const normalizeDate = (date) => {
         if (!date) return new Date(NaN);
         const d = new Date(date);
@@ -56,10 +55,8 @@ const CoordinatorOverview = () => {
                 })
             ]);
 
-            // Get today's date normalized
             const today = normalizeDate(new Date());
 
-            // Calculate new jobs created today
             const newJobs = jobsRes.data?.data?.filter(job => {
                 if (!job.createdAt) return false;
                 const jobDate = normalizeDate(job.createdAt);
@@ -95,7 +92,6 @@ const CoordinatorOverview = () => {
             const jobs = jobsRes.data?.data || [];
             const partsRequests = partsRes.data?.data || [];
 
-            // Process job trends data (last 7 days)
             const today = normalizeDate(new Date());
             const jobTrends = Array.from({ length: 7 }, (_, i) => {
                 const date = new Date(today);
@@ -116,7 +112,6 @@ const CoordinatorOverview = () => {
                 };
             });
 
-            // Process job status distribution
             const statusCounts = {};
             jobs.forEach(job => {
                 if (job.status) {
@@ -128,7 +123,6 @@ const CoordinatorOverview = () => {
                 value
             }));
 
-            // Process parts status distribution
             const partsStatusCounts = {};
             partsRequests.forEach(request => {
                 if (request.status) {
@@ -174,14 +168,12 @@ const CoordinatorOverview = () => {
 
     return (
         <div className={`p-4 space-y-6 ${isDark ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-800'} min-h-screen`}>
-            {/* Header Actions */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-[#1E4065]'}`}>
                     Coordinator Dashboard
                 </h2>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <StatCard
                     icon={FiBriefcase}
@@ -217,7 +209,6 @@ const CoordinatorOverview = () => {
                 />
             </div>
 
-            {/* Charts */}
             <BaseAnalytics
                 title="Analytics Overview"
                 data={analytics}

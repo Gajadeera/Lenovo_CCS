@@ -23,7 +23,6 @@ const MyJobs = ({ technicianId }) => {
     });
     const { user: currentUser } = useAuth();
 
-    // Safe date parsing function
     const safeParseISO = (dateString) => {
         if (!dateString) return null;
         try {
@@ -35,7 +34,6 @@ const MyJobs = ({ technicianId }) => {
         }
     };
 
-    // Format date safely
     const safeFormatDate = (dateString, formatString = 'MM/dd/yyyy') => {
         const date = safeParseISO(dateString);
         return date ? format(date, formatString) : 'N/A';

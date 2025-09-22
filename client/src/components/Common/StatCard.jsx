@@ -1,4 +1,3 @@
-// components/StatCard.jsx
 import React from 'react';
 import { useDarkMode } from '../../../context/DarkModeContext';
 
@@ -17,14 +16,10 @@ const StatCard = ({
     const contextIsDark = useDarkMode()?.isDark;
     const isDark = contextIsDark;
     const borderColor = isDark ? 'border-white' : 'border-black';
-
-    // Helper function to safely render the value
     const renderValue = () => {
         if (value === null || value === undefined) {
             return 'N/A';
         }
-
-        // Handle objects
         if (typeof value === 'object') {
             if (Array.isArray(value)) {
                 return value.length;
@@ -35,11 +30,9 @@ const StatCard = ({
             return JSON.stringify(value);
         }
 
-        // Handle numbers, strings, etc.
         return value;
     };
 
-    // Size classes based on compact mode
     const paddingClass = compact ? 'p-4' : 'p-6';
     const textSizeClass = compact ? 'text-lg' : 'text-2xl';
     const iconSizeClass = compact ? 'w-4 h-4' : 'w-5 h-5';

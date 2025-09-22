@@ -16,7 +16,6 @@ const FilterModal = ({
     const { isDark } = useDarkMode();
     const [localFilters, setLocalFilters] = useState({});
 
-    // Reset local filters when modal opens or filters change
     useEffect(() => {
         if (isOpen) {
             const initialFilters = {};
@@ -27,12 +26,10 @@ const FilterModal = ({
             });
             setLocalFilters(initialFilters);
         } else {
-            // Reset local filters when modal closes
             setLocalFilters({});
         }
     }, [isOpen, filters]);
 
-    // Group filters into rows of 3
     const groupedFilters = [];
     for (let i = 0; i < filters.length; i += 3) {
         groupedFilters.push(filters.slice(i, i + 3));
@@ -59,7 +56,6 @@ const FilterModal = ({
     };
 
     const handleClose = () => {
-        // Reset local filters when closing without applying
         setLocalFilters({});
         onClose();
     };
@@ -125,7 +121,6 @@ const FilterModal = ({
                                 {renderFilterInput(filter)}
                             </div>
                         ))}
-                        {/* Add empty divs to maintain grid layout if row has less than 3 filters */}
                         {filterRow.length < 3 && Array.from({ length: 3 - filterRow.length }).map((_, index) => (
                             <div key={`empty-${index}`} className="hidden md:block"></div>
                         ))}

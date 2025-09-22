@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
-import { useDarkMode } from '../../../context/DarkModeContext'; // Import dark mode hook
+import { useDarkMode } from '../../../context/DarkModeContext';
 import SideBar from './SideBar';
 import NavBar from './NavBar';
 
@@ -17,11 +17,7 @@ const DashboardLayout = ({
 
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-
-    // Allow scrolling only for analytics view
     const shouldScroll = activeView === 'analytics';
-
-    // Load sidebar collapsed state from localStorage
     useEffect(() => {
         const savedState = localStorage.getItem('sidebarCollapsed');
         if (savedState) {
@@ -48,14 +44,12 @@ const DashboardLayout = ({
 
     return (
         <div className={`flex flex-col h-screen ${isDark ? 'dark' : ''}`}>
-            {/* Top Navigation Bar */}
             <NavBar
                 user={user}
                 onMenuToggle={toggleMobileSidebar}
                 isSidebarCollapsed={isSidebarCollapsed}
             />
 
-            {/* Main Layout */}
             <div className="flex flex-1 overflow-hidden relative bg-gray-50 dark:bg-gray-900">
                 {/* Sidebar (slides in on mobile) */}
                 <div
@@ -72,7 +66,7 @@ const DashboardLayout = ({
                     />
                 </div>
 
-                {/* Dark Overlay for Mobile */}
+
                 {showMobileSidebar && (
                     <div
                         className="fixed inset-0 bg-black bg-opacity-40 z-10 md:hidden"
@@ -80,7 +74,6 @@ const DashboardLayout = ({
                     ></div>
                 )}
 
-                {/* Main Content */}
                 <main
                     className={`flex-1 h-full transition-all duration-300 ease-in-out bg-gray-50 dark:bg-gray-900
           ${isSidebarCollapsed ? 'md:ml-0' : ''} ${shouldScroll ? 'overflow-y-auto' : 'overflow-hidden'

@@ -1,4 +1,3 @@
-// TechnicianPerformance.jsx
 import React from 'react';
 import BaseAnalytics, { LoadingSpinner } from '../Common/BaseAnalytics';
 import { BarChartComponent } from '../Common/ChartComponents';

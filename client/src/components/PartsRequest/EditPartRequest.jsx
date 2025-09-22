@@ -11,7 +11,6 @@ import BaseInput from '../Common/BaseInput';
 import BaseSelectInput from '../Common/BaseSelectInput';
 import Button from '../Common/Button';
 
-// Constants
 const ACCEPTED_FILE_TYPES = [
     'image/jpeg',
     'image/png',
@@ -20,7 +19,7 @@ const ACCEPTED_FILE_TYPES = [
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 ];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const MAX_FILES = 5;
 
 const urgencyOptions = [
@@ -61,14 +60,9 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
         return { Authorization: `Bearer ${token}` };
     }, [currentUser]);
 
-
-
-    // Initialize form data from request
     useEffect(() => {
         const initializeData = async () => {
             if (!isOpen) return;
-
-            // At the top of your component, add this check
             const filteredJobs = Array.isArray(jobs)
                 ? jobs.filter(job =>
                     job.job_number?.toLowerCase().includes(jobSearch.toLowerCase()) ||
@@ -91,8 +85,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                     });
 
                     setJobSearch(request.job_id?.job_number || '');
-
-                    // Handle attachments
                     if (request.attachments) {
                         const existingPreviews = request.attachments.map(attachment => ({
                             id: attachment.public_id || attachment._id,
@@ -116,8 +108,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
 
         initializeData();
     }, [isOpen, request, getAuthHeaders]);
-
-    // Clean up object URLs
     useEffect(() => {
         return () => {
             filePreviews.forEach(file => {
@@ -270,7 +260,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    {/* Job Section - Only show for admins/managers */}
                     {(currentUser?.role === 'administrator' || currentUser?.role === 'manager') && (
                         <div className="col-span-4 md:col-span-2 relative">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Job *</label>
@@ -307,7 +296,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                         </div>
                     )}
 
-                    {/* Urgency */}
                     <div className="col-span-4 md:col-span-1">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Urgency *</label>
                         <select
@@ -323,7 +311,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                         </select>
                     </div>
 
-                    {/* Status (only for admins/managers) */}
                     {(currentUser?.role === 'administrator' || currentUser?.role === 'manager' || currentUser?.role === 'parts_team') && (
                         <div className="col-span-4 md:col-span-1">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
@@ -339,8 +326,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                             </select>
                         </div>
                     )}
-
-                    {/* Rejection Reason (only when status is Rejected) */}
                     {formData.status === 'Rejected' && (
                         <div className="col-span-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">Rejection Reason *</label>
@@ -354,8 +339,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                             />
                         </div>
                     )}
-
-                    {/* Parts Description */}
                     <div className="col-span-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Parts Description *</label>
                         <textarea
@@ -368,7 +351,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                         />
                     </div>
 
-                    {/* Notes */}
                     <div className="col-span-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                         <textarea
@@ -379,8 +361,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                             className="block w-full pl-3 pr-3 py-2 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#65C2CB] focus:border-[#1E4065] sm:text-sm bg-white text-gray-900"
                         />
                     </div>
-
-                    {/* Attachments */}
                     <div className="col-span-4 md:col-span-3 flex items-center">
                         <label className="block text-sm font-medium text-gray-700 mr-2">Attachments:</label>
                         <label className="inline-flex items-center p-2 rounded-md bg-gray-100 hover:bg-gray-200 cursor-pointer transition-colors">
@@ -402,7 +382,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                         )}
                     </div>
 
-                    {/* File Previews */}
                     {filePreviews.length > 0 && (
                         <div className="col-span-4 space-y-2">
                             <div className="flex flex-wrap gap-2">
@@ -438,7 +417,6 @@ const EditPartRequest = ({ isOpen, onClose, request, onUpdate, jobs }) => {
                     )}
                 </div>
 
-                {/* Form Actions */}
                 <div className="flex justify-end space-x-3 mt-4">
                     <Button
                         type="button"

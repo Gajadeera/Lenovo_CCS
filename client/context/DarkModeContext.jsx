@@ -1,11 +1,10 @@
-// src/contexts/DarkModeContext.jsx
+
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const DarkModeContext = createContext();
 
 export function DarkModeProvider({ children }) {
     const [isDark, setIsDark] = useState(() => {
-        // Check for saved preference or system preference
         const saved = localStorage.getItem('darkMode');
         if (saved !== null) return JSON.parse(saved);
 
@@ -13,7 +12,6 @@ export function DarkModeProvider({ children }) {
     });
 
     useEffect(() => {
-        // Listen for system preference changes (only if no user preference set)
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
         const handleChange = () => {
@@ -27,10 +25,8 @@ export function DarkModeProvider({ children }) {
     }, []);
 
     useEffect(() => {
-        // Save preference to localStorage
         localStorage.setItem('darkMode', JSON.stringify(isDark));
 
-        // Apply class to document for Tailwind v4
         if (isDark) {
             document.documentElement.classList.add('dark');
         } else {

@@ -13,7 +13,6 @@ export const UserSocketProvider = ({ children }) => {
     useEffect(() => {
         if (!socket) return;
 
-        // Handle user creation
         const handleUserCreated = (data) => {
             const notification = {
                 id: data.eventId,
@@ -29,7 +28,6 @@ export const UserSocketProvider = ({ children }) => {
             toast.success(notification.message);
         };
 
-        // Handle user updates
         const handleUserUpdated = (data) => {
             const changes = data.metadata?.changedFields?.join(', ') || 'details';
             const message = `✏️ ${data.initiatedBy.name} updated user: ${data.user.name} (${changes})`;
@@ -48,7 +46,6 @@ export const UserSocketProvider = ({ children }) => {
             toast(notification.message);
         };
 
-        // Handle user deletion
         const handleUserDeleted = (data) => {
             const notification = {
                 id: data.eventId,
@@ -62,7 +59,6 @@ export const UserSocketProvider = ({ children }) => {
             toast.error(notification.message);
         };
 
-        // Handle user login
         const handleUserLogin = (data) => {
             const notification = {
                 id: data.eventId,
@@ -77,7 +73,6 @@ export const UserSocketProvider = ({ children }) => {
             toast(notification.message, { icon: '🔐' });
         };
 
-        // Handle user profile updates
         const handleUserProfileUpdated = (data) => {
             const changes = data.metadata?.changedFields?.join(', ') || 'profile';
             const message = `✏️ Your profile was updated: ${changes} changed`;
@@ -96,7 +91,6 @@ export const UserSocketProvider = ({ children }) => {
             toast.success(notification.message);
         };
 
-        // Handle password changes
         const handleUserPasswordChanged = (data) => {
             const notification = {
                 id: data.eventId,
@@ -111,7 +105,6 @@ export const UserSocketProvider = ({ children }) => {
             toast.success(notification.message);
         };
 
-        // Handle password reset requests
         const handleUserPasswordResetRequested = (data) => {
             const notification = {
                 id: data.eventId,
@@ -126,7 +119,6 @@ export const UserSocketProvider = ({ children }) => {
             toast(notification.message, { icon: '🔐' });
         };
 
-        // Handle password resets
         const handleUserPasswordReset = (data) => {
             const notification = {
                 id: data.eventId,
@@ -141,7 +133,6 @@ export const UserSocketProvider = ({ children }) => {
             toast.success(notification.message);
         };
 
-        // Handle user welcome
         const handleUserWelcome = (data) => {
             const notification = {
                 id: data.eventId,
@@ -156,7 +147,6 @@ export const UserSocketProvider = ({ children }) => {
             toast.success(notification.message);
         };
 
-        // Handle user stats updates
         const handleUserStatsUpdated = (data) => {
             const notification = {
                 id: new Date().getTime().toString(),
@@ -168,7 +158,6 @@ export const UserSocketProvider = ({ children }) => {
             setUserNotifications(prev => [notification, ...prev]);
         };
 
-        // Handle user activity updates
         const handleUserActivityUpdated = (data) => {
             const notification = {
                 id: new Date().getTime().toString(),
@@ -180,7 +169,6 @@ export const UserSocketProvider = ({ children }) => {
             setUserNotifications(prev => [notification, ...prev]);
         };
 
-        // Handle role distribution updates
         const handleRoleDistributionUpdated = (data) => {
             const notification = {
                 id: new Date().getTime().toString(),
@@ -192,7 +180,6 @@ export const UserSocketProvider = ({ children }) => {
             setUserNotifications(prev => [notification, ...prev]);
         };
 
-        // Handle user growth updates
         const handleUserGrowthUpdated = (data) => {
             const notification = {
                 id: new Date().getTime().toString(),
@@ -204,7 +191,6 @@ export const UserSocketProvider = ({ children }) => {
             setUserNotifications(prev => [notification, ...prev]);
         };
 
-        // Subscribe to user events
         const unsubCreated = subscribe('user-created', handleUserCreated);
         const unsubUpdated = subscribe('user-updated', handleUserUpdated);
         const unsubDeleted = subscribe('user-deleted', handleUserDeleted);

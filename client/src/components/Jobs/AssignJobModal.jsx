@@ -28,7 +28,7 @@ const AssignJobModal = ({
     const [isAlreadyAssigned, setIsAlreadyAssigned] = useState(false);
     const [currentTechnician, setCurrentTechnician] = useState(null);
 
-    // Priority color mapping for assignment status
+
     const assignmentStatusColors = {
         High: 'bg-red-50 border-red-200 text-red-800',
         Medium: 'bg-yellow-50 border-yellow-200 text-yellow-800',
@@ -36,14 +36,14 @@ const AssignJobModal = ({
         default: 'bg-gray-50 border-gray-200 text-gray-800'
     };
 
-    // Get current date/time in the correct format for datetime-local input
+
     const getCurrentDateTime = () => {
         const now = new Date();
         // Convert to ISO string and remove the 'Z' and milliseconds
         return now.toISOString().slice(0, 16);
     };
 
-    // Fetch job details and technicians list
+
     useEffect(() => {
         const fetchData = async () => {
             if (!isOpen || !jobId) return;

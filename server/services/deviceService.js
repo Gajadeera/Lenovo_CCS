@@ -13,7 +13,6 @@ class DeviceService {
 
     static async createDevice(deviceData, userId) {
         try {
-            // Basic validation
             if (!deviceData.model_number || !deviceData.serial_number) {
                 throw new ApiError(400, 'Model number and serial number are required');
             }
@@ -32,7 +31,6 @@ class DeviceService {
 
             const populatedDevice = await this.populateDevice(Device.findById(device._id));
 
-            // Create role-based notification using enhanced service
             await notificationService.createNotification({
                 targetRoles: ['coordinator', 'manager'],
                 message: `New device added: ${populatedDevice.model_number} (${populatedDevice.serial_number})`,
@@ -46,7 +44,6 @@ class DeviceService {
                 }
             });
 
-            // Emit socket event
             const io = getIO();
             if (io) {
                 const eventData = {
@@ -84,15 +81,12 @@ class DeviceService {
                 all = false
             } = filters;
 
-            // If all=true, return all devices with customer populated
             if (all == 'true') {
                 const devices = await Device.find({})
                     .populate('customer', 'name email phone')
                     .lean();
                 return devices;
             }
-
-            // Build filter object
             const filter = {};
 
             if (serial_number) filter.serial_number = { $regex: serial_number, $options: 'i' };
@@ -102,7 +96,7 @@ class DeviceService {
             if (warranty_status) filter.warranty_status = warranty_status;
             if (customer) filter.customer = customer;
 
-            // Pagination
+
             const pageNum = Math.max(1, parseInt(page));
             const limitNum = Math.max(1, parseInt(limit));
 
@@ -163,12 +157,10 @@ class DeviceService {
                 }
             ).populate('customer', 'name email phone');
 
-            // Get changed fields
             const changedFields = Object.keys(updateData).filter(key => {
                 return JSON.stringify(oldValues[key]) !== JSON.stringify(updateData[key]);
             });
 
-            // Create role-based notification using enhanced service
             await notificationService.createNotification({
                 targetRoles: ['coordinator', 'manager'],
                 message: `Device ${device.model_number} (${device.serial_number}) has been updated`,
@@ -182,8 +174,6 @@ class DeviceService {
                     changedFields: changedFields
                 }
             });
-
-            // Emit socket event
             const io = getIO();
             if (io) {
                 const eventData = {
@@ -222,8 +212,6 @@ class DeviceService {
             }
 
             await Device.findByIdAndDelete(deviceId);
-
-            // Create role-based notification using enhanced service
             await notificationService.createNotification({
                 targetRoles: ['coordinator', 'manager'],
                 message: `Device ${device.model_number} (${device.serial_number}) has been deleted`,
@@ -237,7 +225,6 @@ class DeviceService {
                 }
             });
 
-            // Emit socket event
             const io = getIO();
             if (io) {
                 const eventData = {
@@ -278,8 +265,6 @@ class DeviceService {
             if (!warrantyInfo) {
                 throw new ApiError(404, 'Warranty information not found for this device');
             }
-
-            // Check if device exists and update warranty status
             const device = await Device.findOne({ serial_number: serialNumber });
             if (device && device.warranty_status !== warrantyInfo.warranty_status) {
                 const oldWarrantyStatus = device.warranty_status;
@@ -290,10 +275,8 @@ class DeviceService {
                     { new: true }
                 ).populate('customer', 'name email phone');
 
-                // Create notifications using enhanced service
                 const notificationPromises = [];
 
-                // Notification for coordinators and managers
                 notificationPromises.push(
                     notificationService.createNotification({
                         targetRoles: ['coordinator', 'manager'],
@@ -309,8 +292,6 @@ class DeviceService {
                         }
                     })
                 );
-
-                // Notification for customer if device is assigned to one
                 if (updatedDevice.customer) {
                     notificationPromises.push(
                         notificationService.createNotification({
@@ -330,7 +311,6 @@ class DeviceService {
 
                 await Promise.all(notificationPromises);
 
-                // Emit socket events
                 const io = getIO();
                 if (io) {
                     const eventData = {

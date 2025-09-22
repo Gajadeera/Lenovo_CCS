@@ -30,7 +30,6 @@ const AdminDashboard = () => {
     const [clearedNotifications, setClearedNotifications] = useState([]);
     const prevOnlineUsersRef = useRef([]);
 
-    // Filter and combine notifications
     const getFilteredNotifications = () => {
         const filterValidNotifications = (notifications) => {
             if (!notifications) return [];
@@ -50,7 +49,6 @@ const AdminDashboard = () => {
 
     const allNotifications = getFilteredNotifications();
 
-    // Handle online users changes
     useEffect(() => {
         const newUsers = onlineUsersList.filter(user =>
             !prevOnlineUsersRef.current.some(u => u.userId === user.userId)
@@ -67,7 +65,6 @@ const AdminDashboard = () => {
         prevOnlineUsersRef.current = onlineUsersList;
     }, [onlineUsersList, currentUser?._id]);
 
-    // Join necessary rooms when connected
     useEffect(() => {
         if (!isConnected || !currentUser?._id) return;
 

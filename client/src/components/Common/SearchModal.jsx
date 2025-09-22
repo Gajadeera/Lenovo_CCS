@@ -134,8 +134,8 @@ const SearchModal = ({ isOpen, onClose }) => {
         <button
             onClick={() => setActiveTab(tab)}
             className={`px-3 py-1 text-sm rounded-full transition-colors ${activeTab === tab
-                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
         >
             {label}
@@ -187,7 +187,6 @@ const SearchModal = ({ isOpen, onClose }) => {
                             ) : null}
 
                             <TabButton tab="jobs" label="Jobs" />
-                            {/* Add more tabs based on user role */}
                         </div>
                     </div>
 

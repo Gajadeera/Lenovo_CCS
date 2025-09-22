@@ -2,16 +2,14 @@ const express = require('express');
 const { authentication, authorization } = require('../middlewares/authMiddlware');
 const activityLogger = require('../middlewares/activityLogger');
 const systemIssueController = require('../controllers/systemIssueController');
-const upload = require('../middlewares/upload'); // Import multer
+const upload = require('../middlewares/upload');
 
 const router = express.Router();
 
 router.use(authentication(), activityLogger);
-
-// Apply multer middleware for file uploads
 router.post('/',
     authorization(['administrator', 'manager', 'coordinator', 'technician', 'parts_team']),
-    upload.array('screenshots', 5), // Handle up to 5 files
+    upload.array('screenshots', 5),
     systemIssueController.createSystemIssue
 );
 
@@ -32,7 +30,7 @@ router.get('/:issueId',
 
 router.patch('/:issueId',
     authorization(['administrator', 'manager']),
-    upload.array('screenshots', 5), // Handle up to 5 files
+    upload.array('screenshots', 5),
     systemIssueController.updateSystemIssue
 );
 

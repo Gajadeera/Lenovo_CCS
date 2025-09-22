@@ -9,32 +9,26 @@ import ForgotPassword from './components/Common/ForgotPassword';
 import { DarkModeProvider } from '../context/DarkModeContext';
 import DarkModeToggle from './components/Common/DarkModeToggle';
 
-// Dashboard Components
 import AdminDashboard from './pages/Dashboard/AdminDashboard';
 import TechnicianDashboard from './pages/Dashboard/TechnicianDashboard';
 import ManagerDashboard from './pages/Dashboard/ManagerDashboard';
 import CoordinatorDashboard from './pages/Dashboard/CoordinatorDashboard';
 import PartsTeamDashboard from './pages/Dashboard/PartsTeamDashboard';
 
-// User Components
 import AllUsers from './components/Users/AllUsers';
 import SingleUser from './components/Users/SingleUser';
 
-// Customer Components
 import AllCustomers from './components/Customers/AllCustomers';
 import SingleCustomer from './components/Customers/SingleCustomer';
 
-// Device Components
 import AllDevices from './components/Devices/AllDevices';
 import SingleDevice from './components/Devices/SingleDevice';
 
-// Job Components
 import AllJobs from './components/Jobs/AllJobs';
 import SingleJob from './components/Jobs/SingleJob';
 import SingleRequest from './components/PartsRequest/SingleRequest';
 import CreateJob from './components/Jobs/CreateJob';
 
-// Context Providers
 import { AllSocketProviders } from '../context/AllSocketProviders';
 
 const App = () => {
@@ -44,7 +38,6 @@ const App = () => {
         <DarkModeProvider>
           <AllSocketProviders>
             <BrowserRouter>
-              {/* Main container with dark mode classes */}
               <div className="min-h-full bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
                 <Toaster
                   position="top-center"

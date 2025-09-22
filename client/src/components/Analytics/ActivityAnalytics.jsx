@@ -1,4 +1,3 @@
-// ActivityAnalytics.jsx
 import React from 'react';
 import BaseAnalytics, { LoadingSpinner } from '../Common/BaseAnalytics';
 import { PieChartComponent, LineChartComponent, BarChartComponent } from '../Common/ChartComponents';

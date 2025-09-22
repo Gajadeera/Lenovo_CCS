@@ -13,7 +13,6 @@ class PartsRequestService {
         this.models = { PartsRequest, Job, User };
     }
 
-    // Common population configuration
     get populateConfig() {
         return [
             {
@@ -26,7 +25,6 @@ class PartsRequestService {
         ];
     }
 
-    // Helper function for common parts request population
     populatePartsRequest(query) {
         return query.populate(this.populateConfig);
     }
@@ -158,7 +156,6 @@ class PartsRequestService {
                 updated_at: new Date()
             });
 
-            // Handle file uploads
             if (files?.length > 0) {
                 tempFilePaths = files.map(file => file.path);
                 partsRequest.attachments = await this.handlePartsRequestFileUploads(files, partsRequest._id, user._id);
@@ -168,8 +165,6 @@ class PartsRequestService {
             const populatedRequest = await this.populatePartsRequest(
                 this.models.PartsRequest.findById(partsRequest._id)
             );
-
-            // Create notifications
             await Promise.all([
                 this.createNotification(
                     { roles: ['manager', 'parts_team'] },
@@ -197,7 +192,6 @@ class PartsRequestService {
                 )
             ]);
 
-            // Emit socket events
             await this.emitPartsRequestEvent('created', populatedRequest, user);
 
             return {
@@ -222,7 +216,6 @@ class PartsRequestService {
         if (requested_by) filter.requested_by = requested_by;
         if (request_number) filter._id = request_number;
 
-        // Handle job number filter
         if (job_number) {
             const matchingJobs = await this.models.Job.find({
                 job_number: { $regex: job_number, $options: 'i' }
@@ -368,7 +361,6 @@ class PartsRequestService {
             const oldStatus = partsRequest.status;
             const canUpdateStatus = ['administrator', 'manager', 'parts_team'].includes(user.role);
 
-            // Handle status updates
             if (data.status && data.status !== oldStatus) {
                 if (!canUpdateStatus) {
                     throw new ApiError(403, 'Not authorized to update status');
@@ -393,8 +385,6 @@ class PartsRequestService {
 
                 partsRequest.status = data.status;
             }
-
-            // Handle file operations
             if (data.documents_to_delete) {
                 const docsToDelete = this.parseDocumentsToDelete(data.documents_to_delete);
                 await cloudinaryService.deleteMultipleFiles(docsToDelete);
@@ -409,7 +399,6 @@ class PartsRequestService {
                 partsRequest.attachments.push(...newAttachments);
             }
 
-            // Update other fields
             Object.assign(partsRequest, {
                 parts_description: data.parts_description || partsRequest.parts_description,
                 urgency: data.urgency || partsRequest.urgency,
@@ -422,12 +411,10 @@ class PartsRequestService {
                 this.models.PartsRequest.findById(partsRequest._id)
             );
 
-            // Handle notifications for status changes
             if (data.status && data.status !== oldStatus) {
                 await this.handleStatusChangeNotifications(populatedRequest, user, oldStatus, data.status);
             }
 
-            // Emit socket events
             await this.emitPartsRequestEvent('updated', populatedRequest, user, {
                 oldStatus,
                 newStatus: data.status || partsRequest.status
@@ -591,8 +578,6 @@ class PartsRequestService {
             if (partsRequest.status !== 'Pending' && user.role !== 'administrator') {
                 throw new ApiError(400, 'Cannot delete a request that has been processed');
             }
-
-            // Delete attachments
             if (partsRequest.attachments?.length > 0) {
                 const publicIds = partsRequest.attachments.map(attachment => attachment.public_id);
                 await cloudinaryService.deleteMultipleFiles(publicIds);

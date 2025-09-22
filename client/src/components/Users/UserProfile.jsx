@@ -67,12 +67,11 @@ const UserProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Validate file type and size
             if (!file.type.startsWith('image/')) {
                 setError('Please upload an image file');
                 return;
             }
-            if (file.size > 5 * 1024 * 1024) { // 5MB
+            if (file.size > 5 * 1024 * 1024) {
                 setError('Image size should be less than 5MB');
                 return;
             }
@@ -104,7 +103,6 @@ const UserProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
         if (e) e.preventDefault();
         setError('');
 
-        // Validation
         if (!formData.name) {
             setError('Please fill in your name');
             return;
@@ -117,12 +115,10 @@ const UserProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
             formDataToSend.append('name', formData.name);
             formDataToSend.append('phone', formData.phone || '');
 
-            // Add image file if selected
             if (imageFile) {
                 formDataToSend.append('image', imageFile);
             }
 
-            // Check if user wants to remove the image
             const hasExistingImage = currentUser.image?.url &&
                 currentUser.image.url !== 'https://res.cloudinary.com/demo/image/upload/v1626282931/sample.jpg';
             const wantsToRemoveImage = !imageFile && !previewImage && hasExistingImage;
@@ -139,8 +135,6 @@ const UserProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
                     }
                 }
             );
-
-            // Update auth context with new user data
             if (updateUser) {
                 updateUser(response.data);
             }
@@ -161,7 +155,7 @@ const UserProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
     };
 
     const handleCancelEdit = () => {
-        fetchUserData(); // Reset form data
+        fetchUserData();
         setIsEditing(false);
         setImageFile(null);
         setError('');
@@ -193,7 +187,6 @@ const UserProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
                     )}
 
                     <div className="flex flex-col md:flex-row gap-6">
-                        {/* Profile Picture */}
                         <div className="flex-shrink-0 flex flex-col items-center">
                             <div className="relative">
                                 <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden border-4 border-teal-400 dark:border-teal-500">
@@ -235,7 +228,6 @@ const UserProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
                             </div>
                         </div>
 
-                        {/* User Details */}
                         <div className="flex-1">
                             <div className="space-y-4">
                                 <div>
@@ -311,7 +303,6 @@ const UserProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
                             <div className="flex mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">
                                 {isEditing ? (
                                     <>

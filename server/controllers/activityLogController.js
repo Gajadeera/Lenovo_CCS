@@ -18,7 +18,6 @@ const getUserActivitySummary = async (req, res, next) => {
     }
 };
 
-// Optional: Additional controller methods if you add more service methods
 const getRecentActivities = async (req, res, next) => {
     try {
         const { limit = 10 } = req.query;
@@ -32,5 +31,5 @@ const getRecentActivities = async (req, res, next) => {
 module.exports = {
     getActivityLogs,
     getUserActivitySummary,
-    getRecentActivities // Optional: if you add this method to the service
+    getRecentActivities
 };

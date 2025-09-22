@@ -1,4 +1,3 @@
-// BaseAnalytics.jsx
 import React from 'react';
 import { PieChart, BarChart, LineChart, Pie, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 
@@ -19,14 +18,12 @@ export const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadi
 
 export const getChartColors = (isDark) => {
     return {
-        // Keep your vibrant data colors the same for both themes
         dataColors: ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'],
-        // Theme-specific colors
-        text: isDark ? '#E5E7EB' : '#374151', // gray-200 : gray-700
-        background: isDark ? '#1F2937' : '#FFFFFF', // gray-800 : white
-        grid: isDark ? '#4B5563' : '#E5E7EB', // gray-600 : gray-200
-        tooltipBackground: isDark ? '#374151' : '#FFFFFF', // gray-700 : white
-        tooltipBorder: isDark ? '#4B5563' : '#E5E7EB', // gray-600 : gray-200
+        text: isDark ? '#E5E7EB' : '#374151',
+        background: isDark ? '#1F2937' : '#FFFFFF',
+        grid: isDark ? '#4B5563' : '#E5E7EB',
+        tooltipBackground: isDark ? '#374151' : '#FFFFFF',
+        tooltipBorder: isDark ? '#4B5563' : '#E5E7EB',
     };
 };
 

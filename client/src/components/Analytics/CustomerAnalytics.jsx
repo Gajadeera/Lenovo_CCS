@@ -1,4 +1,3 @@
-// CustomerAnalytics.jsx
 import React from 'react';
 import BaseAnalytics, { LoadingSpinner } from '../Common/BaseAnalytics';
 import { PieChartComponent, LineChartComponent } from '../Common/ChartComponents';

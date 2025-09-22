@@ -79,7 +79,6 @@ function ReportGenerator() {
             setLoading(true);
             try {
                 const res = await api.get("/reports/history");
-                // Get only the first 5 items
                 setReportHistory((res.data.data || []).slice(0, 5));
             } catch {
                 setError("Failed to fetch report history");
@@ -129,7 +128,6 @@ function ReportGenerator() {
         return (bytes / Math.pow(1024, i)).toFixed(2) + " " + sizes[i];
     };
 
-    // Dark mode classes
     const containerClass = isDark
         ? "bg-gray-800 text-gray-100"
         : "bg-white text-gray-800";
@@ -167,8 +165,6 @@ function ReportGenerator() {
                     {success}
                 </div>
             )}
-
-            {/* Tabs */}
             <div className={`flex border-b mb-4 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
                 {["generate", "history"].map((tab) => (
                     <button
@@ -181,7 +177,6 @@ function ReportGenerator() {
                 ))}
             </div>
 
-            {/* Generate Tab */}
             {activeTab === "generate" && (
                 <div className={`p-4 rounded-lg space-y-4 ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
                     <div>

@@ -31,14 +31,8 @@ const AllPartsRequests = () => {
         urgency: '',
         requested_by: ''
     });
-
-    // Permission checks
     const canProcessRequests = ['administrator', 'manager', 'parts_team'].includes(currentUser?.role);
-
-    // Check if any filters are active
     const hasActiveFilters = Object.values(filters).some(value => value !== '');
-
-    // Safe date parsing function
     const safeParseISO = (dateString) => {
         if (!dateString) return null;
         try {
@@ -50,13 +44,11 @@ const AllPartsRequests = () => {
         }
     };
 
-    // Format date safely
     const safeFormatDate = (dateString, formatString = 'MM/dd/yyyy') => {
         const date = safeParseISO(dateString);
         return date ? format(date, formatString) : 'N/A';
     };
 
-    // Fetch initial data (jobs, technicians)
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
@@ -82,7 +74,6 @@ const AllPartsRequests = () => {
         }
     }, [currentUser]);
 
-    // Fetch requests with filters
     useEffect(() => {
         const fetchRequests = async () => {
             try {
@@ -94,8 +85,8 @@ const AllPartsRequests = () => {
                     params: {
                         page,
                         limit,
-                        sortBy: 'status', // Sort by status to get pending first
-                        sortOrder: 'asc', // Pending will come first in alphabetical order
+                        sortBy: 'status',
+                        sortOrder: 'asc',
                         ...Object.fromEntries(
                             Object.entries(filters)
                                 .filter(([_, value]) => value !== '')
@@ -104,8 +95,6 @@ const AllPartsRequests = () => {
                 };
 
                 const response = await axios.get('http://localhost:5000/parts-requests', config);
-
-                // Sort requests to show pending first on the client side
                 const sortedRequests = sortRequestsByStatus(response.data?.data || []);
 
                 setRequests(sortedRequests);
@@ -127,14 +116,11 @@ const AllPartsRequests = () => {
         }
     }, [currentUser, page, limit, filters, navigate]);
 
-    // Function to sort requests with pending status first
     const sortRequestsByStatus = (requests) => {
         return [...requests].sort((a, b) => {
-            // Pending requests should come first
             if (a.status === 'Pending' && b.status !== 'Pending') return -1;
             if (a.status !== 'Pending' && b.status === 'Pending') return 1;
 
-            // For requests with the same status, sort by date (newest first)
             return new Date(b.requested_at) - new Date(a.requested_at);
         });
     };
@@ -167,8 +153,6 @@ const AllPartsRequests = () => {
     const handleStatusUpdate = async (requestId, newStatus, rejectionReason = '') => {
         try {
             setProcessingRequests(prev => new Set(prev).add(requestId));
-
-            // Prepare update data
             const updateData = { status: newStatus };
             if (newStatus === 'Rejected' && rejectionReason) {
                 updateData.rejection_reason = rejectionReason;
@@ -194,7 +178,6 @@ const AllPartsRequests = () => {
                     ))
                 );
 
-                // Update selected request if it's the one being processed
                 if (selectedRequest && selectedRequest._id === requestId) {
                     setSelectedRequest({
                         ...selectedRequest,
@@ -202,8 +185,6 @@ const AllPartsRequests = () => {
                         rejection_reason: rejectionReason
                     });
                 }
-
-                // Close edit modal if open
                 if (editRequest && editRequest._id === requestId) {
                     setEditRequest(null);
                 }
@@ -397,7 +378,6 @@ const AllPartsRequests = () => {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Parts Requests</h1>
                 <div className="flex space-x-3">
-                    {/* Filter Button */}
                     <Button
                         onClick={() => setShowFilterModal(true)}
                         leftIcon={<FiFilter />}
@@ -420,8 +400,6 @@ const AllPartsRequests = () => {
                     {error}
                 </div>
             )}
-
-            {/* DataTable without built-in filters */}
             <DataTable
                 data={requests}
                 columns={columns}
@@ -437,8 +415,6 @@ const AllPartsRequests = () => {
                 loadingMessage="Loading parts requests..."
                 error={error ? { message: error } : null}
             />
-
-            {/* Filter Modal */}
             <FilterModal
                 isOpen={showFilterModal}
                 onClose={() => setShowFilterModal(false)}
@@ -447,8 +423,6 @@ const AllPartsRequests = () => {
                 onClearFilters={handleClearFilters}
                 title="Filter Parts Requests"
             />
-
-            {/* Single Request Modal */}
             {selectedRequest && (
                 <SingleRequest
                     isOpen={!!selectedRequest}
@@ -463,7 +437,6 @@ const AllPartsRequests = () => {
                 />
             )}
 
-            {/* Edit Request Modal */}
             {editRequest && (
                 <EditPartRequest
                     isOpen={!!editRequest}

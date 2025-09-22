@@ -35,14 +35,11 @@ const AllDevices = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
 
-    // Permission checks
     const canCreateDevices = ['manager', 'coordinator'].includes(currentUser?.role);
     const canDeleteDevices = ['manager'].includes(currentUser?.role);
 
-    // Check if any filters are active
     const hasActiveFilters = Object.values(filters).some(value => value !== '');
 
-    // Safe date parsing function
     const safeParseISO = (dateString) => {
         if (!dateString) return null;
         try {
@@ -54,13 +51,11 @@ const AllDevices = () => {
         }
     };
 
-    // Format date safely
     const safeFormatDate = (dateString, formatString = 'MM/dd/yyyy') => {
         const date = safeParseISO(dateString);
         return date ? format(date, formatString) : 'N/A';
     };
 
-    // Fetch initial data (customers)
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
@@ -80,7 +75,6 @@ const AllDevices = () => {
         }
     }, [currentUser]);
 
-    // Fetch devices with filters
     useEffect(() => {
         const fetchDevices = async () => {
             try {
@@ -100,8 +94,6 @@ const AllDevices = () => {
                 };
 
                 const response = await axios.get('http://localhost:5000/devices', config);
-
-                // Handle both array and paginated response structures
                 const devicesData = response.data.devices || response.data || [];
                 const total = response.data.pagination?.total ||
                     response.data.totalCount ||
@@ -147,7 +139,6 @@ const AllDevices = () => {
                 headers: { Authorization: `Bearer ${currentUser?.token}` }
             });
 
-            // Remove the device from the list
             setDevices(prev => prev.filter(d => d._id !== deviceToDelete._id));
             setTotalCount(prev => prev - 1);
             setShowDeleteModal(false);
@@ -338,7 +329,7 @@ const AllDevices = () => {
             ),
             sortable: true
         },
-        // Add actions column for delete button
+
         {
             key: 'actions',
             header: 'Actions',
@@ -390,7 +381,6 @@ const AllDevices = () => {
                         )}
                     </Button>
 
-                    {/* Create Device Button */}
                     {canCreateDevices && (
                         <Button
                             onClick={() => setShowCreateDeviceModal(true)}
@@ -409,7 +399,6 @@ const AllDevices = () => {
                 </div>
             )}
 
-            {/* DataTable without built-in filters */}
             <DataTable
                 data={devices}
                 columns={columns}
@@ -426,7 +415,6 @@ const AllDevices = () => {
                 error={error ? { message: error } : null}
             />
 
-            {/* Filter Modal */}
             <FilterModal
                 isOpen={showFilterModal}
                 onClose={() => setShowFilterModal(false)}

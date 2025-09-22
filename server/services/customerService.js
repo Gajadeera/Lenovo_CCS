@@ -99,8 +99,6 @@ class CustomerService {
                     customerType: customer.customer_type
                 }
             });
-
-            // Emit socket event
             await this.emitSocketEvent('customer-created', { userId }, customer);
 
             return customer;
@@ -152,12 +150,10 @@ class CustomerService {
                 { new: true, runValidators: true }
             );
 
-            // Get changed fields
             const changedFields = Object.keys(updateData).filter(key =>
                 JSON.stringify(oldValues[key]) !== JSON.stringify(updateData[key])
             );
 
-            // Create notification
             await this.createNotification({
                 message: `Customer ${customer.name} has been updated`,
                 customer: customer,
@@ -168,7 +164,7 @@ class CustomerService {
                 }
             });
 
-            // Emit socket event
+
             await this.emitSocketEvent('customer-updated', {
                 userId,
                 metadata: {
@@ -195,8 +191,6 @@ class CustomerService {
             }
 
             await Customer.findByIdAndDelete(customerId);
-
-            // Create notification
             await this.createNotification({
                 message: `Customer ${customer.name} has been deleted`,
                 customer: customer,
@@ -207,7 +201,6 @@ class CustomerService {
                 }
             });
 
-            // Emit socket event
             await this.emitSocketEvent('customer-deleted', { userId }, {
                 _id: customer._id,
                 name: customer.name,

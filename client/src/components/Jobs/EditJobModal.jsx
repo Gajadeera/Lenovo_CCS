@@ -13,7 +13,7 @@ import BaseInput from '../Common/BaseInput';
 import BaseSelectInput from '../Common/BaseSelectInput';
 import Button from '../Common/Button';
 
-// Constants
+
 const ACCEPTED_FILE_TYPES = [
     'image/jpeg',
     'image/png',
@@ -53,7 +53,7 @@ const statusOptions = [
     { value: 'Reopened', label: 'Reopened' }
 ];
 
-// New Customer Modal Component
+
 const NewCustomerModal = ({ isOpen, onClose, onCustomerCreated, getAuthHeaders }) => {
     const [newCustomer, setNewCustomer] = useState({
         name: '',
@@ -184,7 +184,7 @@ const NewCustomerModal = ({ isOpen, onClose, onCustomerCreated, getAuthHeaders }
     );
 };
 
-// New Device Modal Component
+
 const NewDeviceModal = ({ isOpen, onClose, onDeviceCreated, getAuthHeaders, customerId }) => {
     const [newDevice, setNewDevice] = useState({
         model_number: '',

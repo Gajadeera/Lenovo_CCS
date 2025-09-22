@@ -48,7 +48,6 @@ const CreateCustomerModal = ({ isOpen, onClose, onCreateCustomer }) => {
         e.preventDefault();
         setError('');
 
-        // Validation
         if (!formData.name || !formData.phone || !formData.email) {
             setError('Name, Phone, and Email are required');
             return;
@@ -88,7 +87,7 @@ const CreateCustomerModal = ({ isOpen, onClose, onCreateCustomer }) => {
         >
             <form onSubmit={handleSubmit} className="p-4">
                 {error && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md flex items-center">
+                    <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-md flex items-center">
                         <FiX className="mr-2" />
                         {error}
                     </div>

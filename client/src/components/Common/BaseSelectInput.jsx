@@ -17,9 +17,7 @@ const BaseSelectInput = ({
     dense = false,
     ...rest
 }) => {
-    const { isDark } = useDarkMode(); // Get dark mode state
-
-    // Height classes based on props
+    const { isDark } = useDarkMode();
     const heightClass = compact ? 'py-1' : dense ? 'py-0.5' : 'py-1.5';
     const textSizeClass = compact ? 'text-xs' : 'text-sm';
     const iconSize = compact ? 14 : dense ? 12 : 14;

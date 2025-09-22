@@ -3,12 +3,9 @@ const app = require('./app');
 const { initializeSocket } = require('./socket/socketService');
 
 const PORT = process.env.PORT || 5000;
-const server = http.createServer(app);
-
-// Initialize Socket.IO
+const server = http.createServer(app)
 const io = initializeSocket(server);
 
-// Make io instance available in app
 app.set('io', io);
 
 server.listen(PORT, () => {
@@ -16,7 +13,6 @@ server.listen(PORT, () => {
     console.log(`Socket.IO origin: ${process.env.SOCKET_CLIENT_ORIGIN || 'http://localhost:5173'}`);
 });
 
-// Handle shutdown gracefully
 process.on('SIGTERM', () => {
     console.log('SIGTERM received. Shutting down gracefully');
     server.close(() => {

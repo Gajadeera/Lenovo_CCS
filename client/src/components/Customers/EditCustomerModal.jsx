@@ -35,7 +35,6 @@ const EditCustomerModal = ({ isOpen, onClose, customerId, customerData, onCustom
                 setFetching(true);
                 setError('');
 
-                // If customerData is provided, use that instead of fetching
                 if (customerData) {
                     setFormData({
                         name: customerData.name || '',
@@ -89,7 +88,6 @@ const EditCustomerModal = ({ isOpen, onClose, customerId, customerData, onCustom
         e.preventDefault();
         setError('');
 
-        // Validation
         if (!formData.name || !formData.phone || !formData.email) {
             setError('Name, Phone, and Email are required');
             return;

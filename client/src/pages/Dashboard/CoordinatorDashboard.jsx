@@ -23,7 +23,6 @@ const CoordinatorDashboard = () => {
     const [activeView, setActiveView] = useState('overview');
     const [clearedNotifications, setClearedNotifications] = useState([]);
 
-    // Filter and combine notifications, excluding cleared ones
     const getFilteredNotifications = () => {
         const filterValidNotifications = (notifications) => {
             if (!notifications) return [];
@@ -41,8 +40,6 @@ const CoordinatorDashboard = () => {
     };
 
     const allNotifications = getFilteredNotifications();
-
-    // Join necessary rooms when connected
     useEffect(() => {
         if (!isConnected || !currentUser?._id) return;
 
@@ -63,10 +60,8 @@ const CoordinatorDashboard = () => {
     const handleLinkClick = (view) => setActiveView(view);
 
     const handleClearNotification = (notificationId) => {
-        // Mark as cleared in local state to prevent reappearing
         setClearedNotifications(prev => [...prev, notificationId]);
 
-        // Clear from appropriate real-time notification context
         if (notificationId.startsWith('job-')) {
             clearJobNotification(notificationId);
         } else if (notificationId.startsWith('device-')) {

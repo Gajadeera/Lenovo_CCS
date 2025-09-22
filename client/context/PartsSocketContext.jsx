@@ -9,7 +9,6 @@ export const PartsRequestSocketProvider = ({ children }) => {
     const [partsRequestNotifications, setPartsRequestNotifications] = useState([]);
 
     const createNotification = (data, type, emoji, toastMethod = toast) => {
-        // Extract job number safely - handle both populated and unpopulated job data
         let jobNumber = 'Unknown Job';
 
         if (data.job_id) {
@@ -45,7 +44,6 @@ export const PartsRequestSocketProvider = ({ children }) => {
         console.log('Setting up parts request socket listeners...');
 
         const unsubscribers = [
-            // Main parts request events
             subscribe('parts-request-created', (data) => {
                 console.log('parts-request-created received:', data);
                 createNotification(data, 'created', '🆕', toast.success);
@@ -76,7 +74,6 @@ export const PartsRequestSocketProvider = ({ children }) => {
                 createNotification(data, 'deleted', '🗑️', toast.error);
             }),
 
-            // High urgency events
             subscribe('high-urgency-parts-request-created', (data) => {
                 console.log('high-urgency-parts-request-created received:', data);
                 createNotification(data, 'high urgency created', '🚨🆕', toast.error);
@@ -87,13 +84,11 @@ export const PartsRequestSocketProvider = ({ children }) => {
                 createNotification(data, 'high urgency approved', '🚨✅', toast.success);
             }),
 
-            // Debug all parts-related events
             subscribe('parts-request-*', (data, eventName) => {
                 console.log(`Generic parts request event: ${eventName}`, data);
             })
         ];
 
-        // Add error handling for socket events
         socket.on('error', (error) => {
             console.error('Socket error in parts request context:', error);
             toast.error('Socket connection error');
@@ -108,7 +103,6 @@ export const PartsRequestSocketProvider = ({ children }) => {
             console.log('Cleaning up parts request socket listeners...');
             unsubscribers.forEach(unsub => unsub && unsub());
 
-            // Remove error listeners
             socket.off('error');
             socket.off('connect_error');
         };
@@ -162,13 +156,11 @@ export const usePartsRequestSocket = () => {
     return context;
 };
 
-// Hook for easy access to parts request notifications
 export const usePartsRequestNotifications = () => {
     const { partsRequestNotifications } = usePartsRequestSocket();
     return partsRequestNotifications;
 };
 
-// Hook for easy access to unread count
 export const usePartsRequestUnreadCount = () => {
     const { getUnreadCount } = usePartsRequestSocket();
     return getUnreadCount();

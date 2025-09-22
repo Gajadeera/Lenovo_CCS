@@ -30,14 +30,11 @@ const AllCustomers = () => {
         is_ad_hoc: ''
     });
 
-    // Permission checks
     const canEditCustomers = ['administrator', 'manager'].includes(currentUser?.role);
     const canCreateCustomers = ['administrator', 'manager', 'customer_service'].includes(currentUser?.role);
 
-    // Check if any filters are active
     const hasActiveFilters = Object.values(filters).some(value => value !== '');
 
-    // Safe date parsing function
     const safeParseISO = (dateString) => {
         if (!dateString) return null;
         try {
@@ -49,13 +46,11 @@ const AllCustomers = () => {
         }
     };
 
-    // Format date safely
     const safeFormatDate = (dateString, formatString = 'MM/dd/yyyy') => {
         const date = safeParseISO(dateString);
         return date ? format(date, formatString) : 'N/A';
     };
 
-    // Fetch customers with filters
     useEffect(() => {
         const fetchCustomers = async () => {
             try {
@@ -283,7 +278,6 @@ const AllCustomers = () => {
                         )}
                     </Button>
 
-                    {/* Create Customer Button */}
                     {canCreateCustomers && (
                         <Button
                             onClick={() => setShowCreateModal(true)}
@@ -302,7 +296,6 @@ const AllCustomers = () => {
                 </div>
             )}
 
-            {/* DataTable without built-in filters */}
             <DataTable
                 data={customers}
                 columns={columns}
@@ -319,7 +312,6 @@ const AllCustomers = () => {
                 error={error ? { message: error } : null}
             />
 
-            {/* Filter Modal */}
             <FilterModal
                 isOpen={showFilterModal}
                 onClose={() => setShowFilterModal(false)}
@@ -329,7 +321,6 @@ const AllCustomers = () => {
                 title="Filter Customers"
             />
 
-            {/* Create Customer Modal */}
             {showCreateModal && (
                 <CreateCustomer
                     isOpen={showCreateModal}
@@ -338,7 +329,6 @@ const AllCustomers = () => {
                 />
             )}
 
-            {/* Single Customer Modal */}
             {selectedCustomer && (
                 <SingleCustomerModal
                     isOpen={!!selectedCustomer}

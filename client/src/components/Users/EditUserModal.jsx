@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { FiUpload, FiX, FiUser, FiMail, FiPhone, FiLock } from 'react-icons/fi';
+import { useAuth } from '../../../context/AuthContext';
+import { FiX, FiUser, FiMail, FiPhone, FiLock, FiPlus, FiTrash2 } from 'react-icons/fi';
 import Modal from '../Common/BaseModal';
 import BaseInput from '../Common/BaseInput';
 import BaseSelectInput from '../Common/BaseSelectInput';
 import Button from '../Common/Button';
-import { useAuth } from '../../../context/AuthContext';
+import FileUpload from '../Common/FileUpload';
 
 const roleOptions = [
     { value: 'administrator', label: 'Administrator' },
@@ -16,13 +17,132 @@ const roleOptions = [
     { value: 'parts_team', label: 'Parts Team' }
 ];
 
+const skillOptions = [
+    { value: 'Hardware', label: 'Hardware' },
+    { value: 'Software', label: 'Software' },
+    { value: 'Server', label: 'Server' },
+    { value: 'Electronics', label: 'Electronics' },
+    { value: 'Printer', label: 'Printer' },
+    { value: 'Network', label: 'Network' },
+    { value: 'Network Administration', label: 'Network Administration' },
+    { value: 'System Management', label: 'System Management' },
+    { value: 'Team Management', label: 'Team Management' },
+    { value: 'Operations', label: 'Operations' },
+    { value: 'Coordination', label: 'Coordination' },
+    { value: 'Documentation', label: 'Documentation' },
+    { value: 'Customer Service', label: 'Customer Service' },
+    { value: 'Communication', label: 'Communication' },
+    { value: 'Inventory Management', label: 'Inventory Management' },
+    { value: 'Logistics', label: 'Logistics' }
+];
+
+
+const SkillInput = ({ skill, index, onChange, onRemove, hasError }) => {
+    const handleSkillChange = (field, value) => {
+        onChange(index, field, value);
+    };
+
+    const handleSubskillChange = (subIndex, value) => {
+        const newSubskills = [...skill.subskills];
+        newSubskills[subIndex] = value;
+        onChange(index, 'subskills', newSubskills);
+    };
+
+    const addSubskill = () => {
+        const newSubskills = [...skill.subskills, ''];
+        onChange(index, 'subskills', newSubskills);
+    };
+
+    const removeSubskill = (subIndex) => {
+        const newSubskills = skill.subskills.filter((_, i) => i !== subIndex);
+        onChange(index, 'subskills', newSubskills);
+    };
+
+    return (
+        <div className={`p-4 border ${hasError ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'} rounded-md mb-3`}>
+            <div className="flex justify-between items-center mb-3">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Skill #{index + 1}</h4>
+                <button
+                    type="button"
+                    onClick={() => onRemove(index)}
+                    className="text-red-500 hover:text-red-700 dark:hover:text-red-400"
+                >
+                    <FiTrash2 size={16} />
+                </button>
+            </div>
+
+            <div className="mb-3">
+                <BaseSelectInput
+                    label="Skill *"
+                    name={`skill-${index}`}
+                    value={skill.name}
+                    onChange={(e) => handleSkillChange('name', e.target.value)}
+                    options={skillOptions}
+                    required
+                    hasError={hasError}
+                />
+                {hasError && (
+                    <p className="text-red-500 text-xs mt-1">Please select a skill</p>
+                )}
+            </div>
+
+            <div className="mb-3">
+                <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Subskills
+                    </label>
+                    <button
+                        type="button"
+                        onClick={addSubskill}
+                        className="flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                    >
+                        <FiPlus size={14} className="mr-1" />
+                        Add Subskill
+                    </button>
+                </div>
+
+                {skill.subskills.map((subskill, subIndex) => (
+                    <div key={subIndex} className="flex items-center mb-2">
+                        <BaseInput
+                            value={subskill}
+                            onChange={(e) => handleSubskillChange(subIndex, e.target.value)}
+                            placeholder="Enter subskill"
+                            className="flex-grow"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => removeSubskill(subIndex)}
+                            className="ml-2 text-red-500 hover:text-red-700 dark:hover:text-red-400 p-2"
+                        >
+                            <FiX size={16} />
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+SkillInput.propTypes = {
+    skill: PropTypes.object.isRequired,
+    index: PropTypes.number.isRequired,
+    onChange: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
+    hasError: PropTypes.bool
+};
+
+SkillInput.defaultProps = {
+    hasError: false
+};
+
 const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
         role: 'technician',
-        image: null
+        image: null,
+        skills: []
     });
     const [previewImage, setPreviewImage] = useState('');
     const [showPasswordFields, setShowPasswordFields] = useState(false);
@@ -33,6 +153,7 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
+    const [skillErrors, setSkillErrors] = useState({});
     const { user: currentUser } = useAuth();
 
     const fetchUserData = useCallback(async () => {
@@ -53,7 +174,8 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
                 email: userData.email || '',
                 phone: userData.phone || '',
                 role: userData.role || 'technician',
-                image: null
+                image: null,
+                skills: userData.skills || []
             });
 
             if (userData.image?.url || userData.image) {
@@ -78,23 +200,40 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            // Validate file type and size
-            if (!file.type.startsWith('image/')) {
-                setError('Please upload an image file');
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) { // 5MB
-                setError('Image size should be less than 5MB');
-                return;
-            }
-
+    const handleImageChange = (files) => {
+        if (files && files.length > 0) {
+            const file = files[0];
             setFormData(prev => ({ ...prev, image: file }));
             setPreviewImage(URL.createObjectURL(file));
             setError('');
         }
+    };
+
+    const handleSkillChange = (index, field, value) => {
+        const newSkills = [...formData.skills];
+        newSkills[index] = {
+            ...newSkills[index],
+            [field]: value
+        };
+        setFormData(prev => ({ ...prev, skills: newSkills }));
+        if (field === 'name' && value) {
+            setSkillErrors(prev => ({ ...prev, [index]: false }));
+        }
+    };
+
+    const addSkill = () => {
+        setFormData(prev => ({
+            ...prev,
+            skills: [...prev.skills, { name: '', subskills: [''] }]
+        }));
+    };
+
+    const removeSkill = (index) => {
+        const newSkills = formData.skills.filter((_, i) => i !== index);
+        setFormData(prev => ({ ...prev, skills: newSkills }));
+        const newErrors = { ...skillErrors };
+        delete newErrors[index];
+        setSkillErrors(newErrors);
     };
 
     const handleClose = useCallback(() => {
@@ -103,7 +242,8 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
             email: '',
             phone: '',
             role: 'technician',
-            image: null
+            image: null,
+            skills: []
         });
         setPreviewImage('');
         setPasswordData({
@@ -112,14 +252,13 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
         });
         setShowPasswordFields(false);
         setError('');
+        setSkillErrors({});
         onClose();
     }, [onClose]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-
-        // Validation
         if (!formData.name || !formData.email) {
             setError('Please fill in all required fields');
             return;
@@ -137,6 +276,30 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
             }
         }
 
+        const newSkillErrors = {};
+        let hasEmptySkill = false;
+
+        formData.skills.forEach((skill, index) => {
+            if (!skill.name || skill.name.trim() === '') {
+                newSkillErrors[index] = true;
+                hasEmptySkill = true;
+            }
+        });
+
+        if (hasEmptySkill) {
+            setSkillErrors(newSkillErrors);
+            setError('Please select a skill name for all added skills');
+            return;
+        }
+
+        setSkillErrors({});
+        const validSkills = formData.skills
+            .filter(skill => skill.name && skill.name.trim() !== '')
+            .map(skill => ({
+                name: skill.name,
+                subskills: skill.subskills.filter(sub => sub && sub.trim() !== '')
+            }));
+
         try {
             setLoading(true);
 
@@ -145,12 +308,11 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
             formDataToSend.append('email', formData.email);
             formDataToSend.append('phone', formData.phone);
             formDataToSend.append('role', formData.role);
+            formDataToSend.append('skills', JSON.stringify(validSkills));
 
             if (showPasswordFields) {
                 formDataToSend.append('password', passwordData.newPassword);
             }
-
-            // Add flag to delete old image when uploading new one
             if (formData.image && previewImage && previewImage.includes('cloudinary')) {
                 formDataToSend.append('deleteOldImage', 'true');
             }
@@ -158,7 +320,6 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
             if (formData.image) {
                 formDataToSend.append('image', formData.image);
             } else if (!previewImage) {
-                // If user removed the image
                 formDataToSend.append('removeImage', 'true');
             }
 
@@ -194,12 +355,12 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
         >
             {fetching ? (
                 <div className="p-4 flex justify-center items-center h-40">
-                    <p>Loading user data...</p>
+                    <p className="text-gray-500 dark:text-gray-400">Loading user data...</p>
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="p-4">
                     {error && (
-                        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md flex items-center">
+                        <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 rounded-md flex items-center">
                             <FiX className="mr-2" />
                             {error}
                         </div>
@@ -250,38 +411,66 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
                         </div>
 
                         <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image</label>
-                            <div className="flex items-center">
-                                <label className="flex flex-col items-center px-4 py-2 bg-white rounded-md border border-gray-300 cursor-pointer hover:bg-gray-50">
-                                    <FiUpload className="mr-1" />
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                        className="hidden"
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Profile Image</label>
+                            <FileUpload
+                                onFilesChange={handleImageChange}
+                                accept="image/*"
+                                maxFiles={1}
+                                maxSize={5 * 1024 * 1024}
+                                uploadText="Click to upload or drag and drop"
+                                helperText="Supported formats: JPG, PNG (Max 5MB)"
+                                showPreview={false}
+                            />
+                            {previewImage && (
+                                <div className="mt-3 flex items-center">
+                                    <img
+                                        src={previewImage}
+                                        alt="Preview"
+                                        className="h-12 w-12 object-cover rounded-full"
                                     />
-                                    <span className="text-sm">Change Image</span>
-                                </label>
-                                {previewImage && (
-                                    <div className="ml-4">
-                                        <img
-                                            src={previewImage}
-                                            alt="Preview"
-                                            className="h-12 w-12 object-cover rounded-full"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setPreviewImage('');
-                                                setFormData(prev => ({ ...prev, image: null }));
-                                            }}
-                                            className="text-xs text-red-500 mt-1"
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                )}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setPreviewImage('');
+                                            setFormData(prev => ({ ...prev, image: null }));
+                                        }}
+                                        className="ml-2 text-red-500 hover:text-red-700 dark:hover:text-red-400 text-sm"
+                                    >
+                                        Remove Image
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="col-span-2">
+                            <div className="flex justify-between items-center mb-3">
+                                <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">Skills</h3>
+                                <button
+                                    type="button"
+                                    onClick={addSkill}
+                                    className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                                >
+                                    <FiPlus size={16} className="mr-1" />
+                                    Add Skill
+                                </button>
                             </div>
+
+                            {formData.skills.length === 0 ? (
+                                <div className="text-center py-4 text-gray-500 dark:text-gray-400 border border-dashed border-gray-300 dark:border-gray-600 rounded-md">
+                                    No skills added yet
+                                </div>
+                            ) : (
+                                formData.skills.map((skill, index) => (
+                                    <SkillInput
+                                        key={index}
+                                        skill={skill}
+                                        index={index}
+                                        onChange={handleSkillChange}
+                                        onRemove={removeSkill}
+                                        hasError={skillErrors[index]}
+                                    />
+                                ))
+                            )}
                         </div>
                     </div>
 
@@ -290,13 +479,13 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
                             <button
                                 type="button"
                                 onClick={() => setShowPasswordFields(true)}
-                                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                             >
                                 Change Password
                             </button>
                         ) : (
-                            <div className="space-y-4 mt-4 border-t pt-4">
-                                <h4 className="text-md font-medium">Set New Password</h4>
+                            <div className="space-y-4 mt-4 border-t pt-4 border-gray-200 dark:border-gray-700">
+                                <h4 className="text-md font-medium text-gray-800 dark:text-gray-200">Set New Password</h4>
 
                                 <BaseInput
                                     type="password"
@@ -327,7 +516,7 @@ const EditUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
                                             confirmPassword: ''
                                         });
                                     }}
-                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                    className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium"
                                 >
                                     Cancel Password Change
                                 </button>

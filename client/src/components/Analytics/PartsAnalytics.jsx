@@ -1,4 +1,3 @@
-// PartsAnalytics.jsx
 import React from 'react';
 import BaseAnalytics, { LoadingSpinner } from '../Common/BaseAnalytics';
 import { PieChartComponent, BarChartComponent, LineChartComponent } from '../Common/ChartComponents';

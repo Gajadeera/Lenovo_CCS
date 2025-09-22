@@ -65,7 +65,6 @@ const AnalyticsDashboard = () => {
 
                 const responses = await Promise.all(requests);
 
-                // Transform the data to match each component's expected structure
                 setAnalyticsData({
                     jobs: {
                         statusDistribution: responses[0].data?.statusDistribution || [],

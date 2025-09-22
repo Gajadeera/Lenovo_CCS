@@ -38,22 +38,21 @@ const Button = React.forwardRef((props, ref) => {
         }
     };
 
-    // Base button classes
     const baseClasses = [
         'inline-flex items-center justify-center',
         'font-medium focus:outline-none',
         'disabled:opacity-70 disabled:cursor-not-allowed',
         'transition-all duration-300 ease-in-out',
         'transform active:scale-95',
-        'rounded-full', // Fully rounded pill shape
-        'border', // Border class
+        'rounded-full',
+        'border',
         'focus:ring-2 focus:ring-[#52c3cb] dark:focus:ring-[#52c3cb] focus:ring-offset-2 dark:focus:ring-offset-gray-800',
-        'shadow-sm hover:shadow-md', // Subtle shadows
-        'whitespace-nowrap', // Prevent text wrapping
-        getSizeClasses() // Size classes
+        'shadow-sm hover:shadow-md',
+        'whitespace-nowrap',
+        getSizeClasses()
     ].join(' ');
 
-    // Variant classes for light and dark modes
+
     const getVariantClasses = () => {
         switch (variant) {
             case 'primary':

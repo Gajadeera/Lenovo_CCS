@@ -72,17 +72,22 @@ class AnalyticsService {
     }
 
     static async getJobAnalytics(user) {
-        const [statusDistribution, jobsOverTime, priorityDistribution] = await Promise.all([
-            this.getDistribution(Job, 'status', 'job-status-distribution', user),
-            this.getTimeSeries(Job, 'created_at', '%Y-%m-%d', 'job-time-series', user),
-            this.getDistribution(Job, 'priority', 'job-priority-distribution', user)
-        ]);
+        try {
+            const [statusDistribution, jobsOverTime, priorityDistribution] = await Promise.all([
+                this.getDistribution(Job, 'status', 'job-status-distribution', user),
+                this.getTimeSeries(Job, 'createdAt', '%Y-%m-%d', 'job-time-series', user),
+                this.getDistribution(Job, 'priority', 'job-priority-distribution', user)
+            ]);
 
-        return {
-            statusDistribution,
-            jobsOverTime,
-            priorityDistribution
-        };
+            return {
+                statusDistribution,
+                jobsOverTime,
+                priorityDistribution
+            };
+        } catch (error) {
+            console.error('Job analytics error:', error);
+            throw error;
+        }
     }
 
     static async getCustomerAnalytics(user) {
@@ -190,7 +195,7 @@ class AnalyticsService {
                         $avg: {
                             $divide: [
                                 { $subtract: ["$completed_date", "$created_at"] },
-                                1000 * 60 * 60 // Convert to hours
+                                1000 * 60 * 60
                             ]
                         }
                     }

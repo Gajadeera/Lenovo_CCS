@@ -27,6 +27,6 @@ router.get('/', authorization(['administrator', 'manager', 'coordinator']), user
 
 router.get('/:userId', authorization(['administrator', 'manager']), userController.getUserById);
 router.put('/:userId', authorization(['administrator', 'manager']), upload.single('image'), userController.updateUser);
-router.delete('/:userId', authorization(['administrator', 'manager']), userController.deleteUser);
+router.delete('/:userId', authorization(['administrator']), userController.deleteUser);
 
 module.exports = router;

@@ -34,14 +34,9 @@ const AllJobs = () => {
     const [showCreateJobModal, setShowCreateJobModal] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
     const [showFilterModal, setShowFilterModal] = useState(false);
-
-    // Permission checks
     const canCreateJobs = ['administrator', 'manager', 'coordinator', 'customer_service'].includes(currentUser?.role);
 
-    // Check if any filters are active
     const hasActiveFilters = Object.values(filters).some(value => value !== '');
-
-    // Safe date parsing function
     const safeParseISO = (dateString) => {
         if (!dateString) return null;
         try {
@@ -52,14 +47,11 @@ const AllJobs = () => {
             return null;
         }
     };
-
-    // Format date safely
     const safeFormatDate = (dateString, formatString = 'MM/dd/yyyy') => {
         const date = safeParseISO(dateString);
         return date ? format(date, formatString) : 'N/A';
     };
 
-    // Fetch initial data (technicians, customers, devices)
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
@@ -89,7 +81,6 @@ const AllJobs = () => {
         }
     }, [currentUser]);
 
-    // Fetch jobs with filters
     useEffect(() => {
         const fetchJobs = async () => {
             try {
@@ -384,7 +375,6 @@ const AllJobs = () => {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Job Management</h1>
                 <div className="flex space-x-3">
-                    {/* Filter Button */}
                     <Button
                         onClick={() => setShowFilterModal(true)}
                         leftIcon={<FiFilter />}
@@ -400,7 +390,6 @@ const AllJobs = () => {
                         )}
                     </Button>
 
-                    {/* Create Job Button */}
                     {canCreateJobs && (
                         <Button
                             onClick={() => setShowCreateJobModal(true)}
@@ -435,7 +424,6 @@ const AllJobs = () => {
                 error={error ? { message: error } : null}
             />
 
-            {/* Filter Modal */}
             <FilterModal
                 isOpen={showFilterModal}
                 onClose={() => setShowFilterModal(false)}

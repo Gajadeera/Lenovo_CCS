@@ -19,7 +19,6 @@ const TechnicianDashboard = () => {
     const [activeView, setActiveView] = useState('overview');
     const [clearedNotifications, setClearedNotifications] = useState([]);
 
-    // Filter and combine notifications
     const getFilteredNotifications = () => {
         const filterValidNotifications = (notifications) => {
             if (!notifications) return [];
@@ -38,7 +37,6 @@ const TechnicianDashboard = () => {
 
     const allNotifications = getFilteredNotifications();
 
-    // Join rooms when connected
     useEffect(() => {
         if (!isConnected || !currentUser?._id) return;
 

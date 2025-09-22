@@ -1,4 +1,3 @@
-// src/components/Common/DarkModeToggle.jsx
 import { useDarkMode } from '../../../context/DarkModeContext';
 
 export default function DarkModeToggle() {
@@ -17,7 +16,6 @@ export default function DarkModeToggle() {
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isDark ? 'translate-x-6' : 'translate-x-1'
                     }`}
             />
-            {/* Sun and Moon Icons */}
             <span className="absolute inset-y-0 left-0 flex items-center justify-center px-1">
                 <svg
                     className="h-3 w-3 text-gray-700"

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useAuth } from '../../../context/AuthContext';
-import { FiUser, FiMail, FiPhone, FiShield, FiX, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiShield, FiX, FiEdit, FiTrash2, FiAward, FiTool } from 'react-icons/fi';
 import Modal from '../Common/BaseModal';
 import Button from '../Common/Button';
 import EditUserModal from './EditUserModal';
@@ -44,7 +44,6 @@ const SingleUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
     }, [isOpen, userId, currentUser]);
 
     const handleUserUpdated = (updatedUser) => {
-        // Refresh the user data after update
         fetchUser();
         if (onUserUpdate) {
             onUserUpdate(updatedUser);
@@ -68,6 +67,47 @@ const SingleUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
             console.error('Error deleting user:', err);
             setError(err.response?.data?.message || 'Failed to delete user');
         }
+    };
+    const renderSkills = () => {
+        if (!user.skills || user.skills.length === 0) {
+            return (
+                <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                    No skills added yet
+                </div>
+            );
+        }
+
+        return (
+            <div className="space-y-3">
+                {user.skills.map((skill, index) => (
+                    <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                        <div className="flex items-center mb-2">
+                            <FiTool className="text-blue-500 dark:text-blue-400 mr-2" />
+                            <h4 className="font-medium text-gray-800 dark:text-gray-200 capitalize">
+                                {skill.name}
+                            </h4>
+                        </div>
+                        {skill.subskills && skill.subskills.length > 0 && (
+                            <div className="ml-6 mt-2">
+                                <h5 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                                    Subskills:
+                                </h5>
+                                <div className="flex flex-wrap gap-2">
+                                    {skill.subskills.map((subskill, subIndex) => (
+                                        <span
+                                            key={subIndex}
+                                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300"
+                                        >
+                                            {subskill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        );
     };
 
     if (loading) {
@@ -108,7 +148,6 @@ const SingleUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
             <Modal isOpen={isOpen} onClose={onClose} title="User Details" size="xl">
                 <div className="p-6">
                     <div className="flex flex-col md:flex-row gap-6">
-                        {/* Profile Picture */}
                         <div className="flex-shrink-0">
                             <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden border-4 border-teal-400 dark:border-teal-500">
                                 {user.image?.url ? (
@@ -122,8 +161,6 @@ const SingleUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
                                 )}
                             </div>
                         </div>
-
-                        {/* User Details */}
                         <div className="flex-1">
                             <div className="space-y-4">
                                 <div>
@@ -192,9 +229,17 @@ const SingleUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Action Buttons */}
+                                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <div className="flex items-center mb-4">
+                                        <FiAward className="text-orange-500 dark:text-orange-400 mr-2" />
+                                        <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">
+                                            Skills & Expertise
+                                        </h3>
+                                    </div>
+                                    {renderSkills()}
+                                </div>
+                            </div>
                             <div className="flex mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 gap-3">
                                 {canEdit && (
                                     <Button
@@ -221,7 +266,6 @@ const SingleUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
                 </div>
             </Modal>
 
-            {/* Edit User Modal */}
             <EditUserModal
                 isOpen={showEditModal}
                 onClose={() => setShowEditModal(false)}
@@ -229,7 +273,6 @@ const SingleUserModal = ({ isOpen, onClose, userId, onUserUpdate }) => {
                 onUserUpdate={handleUserUpdated}
             />
 
-            {/* Delete User Modal */}
             <DeleteUserModal
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}

@@ -1,4 +1,3 @@
-// SystemIssuesAnalytics.jsx
 import React from 'react';
 import BaseAnalytics, { LoadingSpinner } from '../Common/BaseAnalytics';
 import { PieChartComponent, BarChartComponent } from '../Common/ChartComponents';

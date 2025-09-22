@@ -27,7 +27,6 @@ const PartsTeamOverview = ({ notifications, onClearNotification }) => {
         loading: true
     });
 
-    // Improved date normalization function
     const normalizeDate = (date) => {
         if (!date) return new Date(NaN);
         const d = new Date(date);
@@ -45,10 +44,8 @@ const PartsTeamOverview = ({ notifications, onClearNotification }) => {
 
             const requests = res.data?.data || [];
 
-            // Get today's date normalized
             const today = normalizeDate(new Date());
 
-            // Calculate new requests created today
             const newRequests = requests.filter(request => {
                 if (!request.requested_at) return false;
                 const requestDate = normalizeDate(request.requested_at);
@@ -80,7 +77,6 @@ const PartsTeamOverview = ({ notifications, onClearNotification }) => {
 
             const requests = res.data?.data || [];
 
-            // Process request trends data (last 7 days)
             const today = normalizeDate(new Date());
             const requestTrends = Array.from({ length: 7 }, (_, i) => {
                 const date = new Date(today);
@@ -101,7 +97,6 @@ const PartsTeamOverview = ({ notifications, onClearNotification }) => {
                 };
             });
 
-            // Process request status distribution
             const statusCounts = {};
             requests.forEach(request => {
                 if (request.status) {
@@ -146,14 +141,12 @@ const PartsTeamOverview = ({ notifications, onClearNotification }) => {
 
     return (
         <div className={`p-4 space-y-6 ${isDark ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-800'} min-h-screen`}>
-            {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-[#1E4065]'}`}>
                     Parts Team Dashboard
                 </h2>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <StatCard
                     icon={FiClock}
@@ -189,7 +182,6 @@ const PartsTeamOverview = ({ notifications, onClearNotification }) => {
                 />
             </div>
 
-            {/* Charts */}
             <BaseAnalytics
                 title="Parts Request Analytics"
                 data={analytics}

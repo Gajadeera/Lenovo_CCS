@@ -8,7 +8,7 @@ export const DeviceSocketProvider = ({ children }) => {
     const { socket, subscribe } = useSocket();
     const [deviceNotifications, setDeviceNotifications] = useState([]);
 
-    // Frontend - DeviceSocketContext.js
+
     useEffect(() => {
         if (!socket) return;
 
@@ -16,7 +16,7 @@ export const DeviceSocketProvider = ({ children }) => {
             const notification = {
                 id: `device-${data.device._id}-${Date.now()}`,
                 type: 'device-created',
-                message: `New device: ${data.device.model_number}`, // Changed from model to model_number
+                message: `New device: ${data.device.model_number}`,
                 deviceId: data.device._id,
                 timestamp: new Date()
             };
@@ -28,7 +28,7 @@ export const DeviceSocketProvider = ({ children }) => {
             const notification = {
                 id: `device-${data.device._id}-${Date.now()}`,
                 type: 'device-updated',
-                message: `Device updated: ${data.device.model_number}`, // Changed from model to model_number
+                message: `Device updated: ${data.device.model_number}`,
                 deviceId: data.device._id,
                 timestamp: new Date()
             };
@@ -60,7 +60,7 @@ export const DeviceSocketProvider = ({ children }) => {
             toast(`📋 ${notification.message}`);
         };
 
-        // Listen for the exact event names emitted by backend
+
         const unsubCreated = subscribe('device-created', handleDeviceCreated);
         const unsubUpdated = subscribe('device-updated', handleDeviceUpdated);
         const unsubDeleted = subscribe('device-deleted', handleDeviceDeleted);

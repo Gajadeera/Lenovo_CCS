@@ -43,7 +43,7 @@ const TechnicianEditJobModal = ({ isOpen, onClose, jobId, jobData: initialJobDat
         return { Authorization: `Bearer ${token}` };
     }, [currentUser]);
 
-    // Initialize form data from initialJobData or fetch fresh data
+
     useEffect(() => {
         const initializeData = async () => {
             if (!isOpen) return;
@@ -53,7 +53,7 @@ const TechnicianEditJobModal = ({ isOpen, onClose, jobId, jobData: initialJobDat
                 setError('');
 
                 if (initialJobData) {
-                    // Use the passed-in job data but only keep allowed fields
+
                     const jobData = initialJobData;
                     setFormData({
                         serial_number: jobData.serial_number || '',
@@ -64,7 +64,7 @@ const TechnicianEditJobModal = ({ isOpen, onClose, jobId, jobData: initialJobDat
                     setDeviceSearch(jobData.device ? `${jobData.device.model_number} (${jobData.device.serial_number})` : '');
                 }
 
-                // Fetch devices
+
                 const devicesRes = await axios.get('http://localhost:5000/devices', {
                     headers: getAuthHeaders()
                 });
@@ -113,7 +113,7 @@ const TechnicianEditJobModal = ({ isOpen, onClose, jobId, jobData: initialJobDat
         try {
             setLoading(true);
 
-            // Only send the fields technicians are allowed to edit
+
             const payload = {
                 serial_number: formData.serial_number,
                 device_id: formData.device_id,

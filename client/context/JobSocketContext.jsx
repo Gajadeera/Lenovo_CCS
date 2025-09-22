@@ -63,7 +63,6 @@ export const JobSocketProvider = ({ children }) => {
             toast.error(`🗑️ ${notification.message}`);
         };
 
-        // Status change notifications
         const handleJobStatusChanged = (data) => {
             console.log('Job status changed event:', data);
             const notification = {
@@ -93,7 +92,6 @@ export const JobSocketProvider = ({ children }) => {
             toast.success(`🏁 ${notification.message}`);
         };
 
-        // Assignment notifications
         const handleJobAssigned = (data) => {
             console.log('Job assigned event:', data);
             const isAssignedToMe = data.job.assigned_to?._id === user._id;
@@ -175,7 +173,6 @@ export const JobSocketProvider = ({ children }) => {
             toast(`👤 ${notification.message}`);
         };
 
-        // Subscribe to all job events
         const unsubscribers = [
             subscribe('job-created', handleJobCreated),
             subscribe('job-updated', handleJobUpdated),

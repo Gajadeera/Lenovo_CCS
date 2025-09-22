@@ -27,7 +27,6 @@ const AdminOverview = ({ onlineUsers, connectionStatus }) => {
         loading: true
     });
 
-    // Fetch stats and analytics
     const fetchData = async () => {
         try {
             const [countsRes, logsRes, summaryRes, usersRes, issuesRes, issuesStatsRes] = await Promise.all([
@@ -53,7 +52,6 @@ const AdminOverview = ({ onlineUsers, connectionStatus }) => {
                 })
             ]);
 
-            // Get open issues count from stats
             const openIssuesCount = issuesStatsRes.data.data?.byStatus?.find(s => s._id === 'Open')?.count || 0;
 
             setStats({
@@ -78,7 +76,6 @@ const AdminOverview = ({ onlineUsers, connectionStatus }) => {
         }
     };
 
-    // Data polling
     useEffect(() => {
         if (!currentUser?.token) return;
         fetchData();
@@ -86,7 +83,6 @@ const AdminOverview = ({ onlineUsers, connectionStatus }) => {
         return () => clearInterval(interval);
     }, [currentUser?.token]);
 
-    // Prepare activity summary chart data
     const prepareActivityData = () => {
         return analytics.activitySummary.map(user => ({
             name: user.user_name,
@@ -98,7 +94,6 @@ const AdminOverview = ({ onlineUsers, connectionStatus }) => {
         }));
     };
 
-    // Prepare last login chart data from users data
     const prepareLoginData = () => {
         const sortedUsers = [...analytics.users]
             .filter(user => user.last_login)
@@ -127,14 +122,12 @@ const AdminOverview = ({ onlineUsers, connectionStatus }) => {
 
     return (
         <div className={`p-4 space-y-6 ${isDark ? 'bg-gray-800 text-white' : 'bg-gray-50 text-gray-800'} min-h-screen`}>
-            {/* Header */}
             <div className="flex justify-between items-center">
                 <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-[#1E4065]'}`}>
                     Admin Dashboard
                 </h2>
             </div>
 
-            {/* Stat Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <StatCard
                     icon={FiUsers}
@@ -170,7 +163,6 @@ const AdminOverview = ({ onlineUsers, connectionStatus }) => {
                 />
             </div>
 
-            {/* Activity Charts */}
             <BaseAnalytics
                 title="User Analytics"
                 data={analytics}

@@ -26,7 +26,6 @@ const AllUsers = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const { onlineUsers, isConnected } = useSocket();
 
-    // Calculate dynamic limit based on user count
     const calculateLimit = (userCount) => {
         return userCount <= 5 ? userCount : 5;
     };
@@ -34,8 +33,6 @@ const AllUsers = () => {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(5);
     const [totalCount, setTotalCount] = useState(0);
-
-    // Enhanced user status calculation
     const calculateUserStatus = (userId) => {
         if (!isConnected) {
             return 'offline';
@@ -45,7 +42,6 @@ const AllUsers = () => {
             return 'offline';
         }
 
-        // Convert both IDs to string for reliable comparison
         const userIdStr = String(userId);
         const isOnline = onlineUsers.users.some(onlineUser => {
             const onlineUserIdStr = String(onlineUser.userId);
@@ -55,7 +51,6 @@ const AllUsers = () => {
         return isOnline ? 'online' : 'offline';
     };
 
-    // Process users with status and default values
     const processUsers = (usersData) => {
         return usersData.map(user => {
             const userId = user._id || user.id;
@@ -69,7 +64,6 @@ const AllUsers = () => {
         });
     };
 
-    // Filter and sort users with optimized performance
     const filteredUsers = useMemo(() => {
         const { name, role, status } = filters;
         const nameLower = name.toLowerCase();
@@ -81,18 +75,13 @@ const AllUsers = () => {
                     (!status || user.status === status);
             })
             .sort((a, b) => {
-                // Online users first
                 if (a.status === 'online' && b.status !== 'online') return -1;
                 if (a.status !== 'online' && b.status === 'online') return 1;
-
-                // Then by last login (recent first)
                 const aLogin = a.last_login ? new Date(a.last_login) : 0;
                 const bLogin = b.last_login ? new Date(b.last_login) : 0;
                 return bLogin - aLogin;
             });
     }, [allUsers, filters]);
-
-    // Fetch users with error handling
     const fetchUsers = async () => {
         try {
             setLoading(true);
@@ -125,14 +114,12 @@ const AllUsers = () => {
         }
     };
 
-    // Initial fetch and when currentUser changes
     useEffect(() => {
         if (currentUser?.token) {
             fetchUsers();
         }
     }, [currentUser]);
 
-    // Update user status when onlineUsers changes
     useEffect(() => {
         if (!isConnected || !onlineUsers?.users) {
             return;
@@ -148,8 +135,6 @@ const AllUsers = () => {
             })
         );
     }, [onlineUsers, isConnected]);
-
-    // Handle user creation with proper status calculation
     const handleCreateUser = (userData) => {
         const newUser = {
             ...userData,
@@ -163,15 +148,12 @@ const AllUsers = () => {
         setLimit(calculateLimit(totalCount + 1));
         setShowCreateUserModal(false);
     };
-
-    // Pagination handler
     const handlePageChange = (newPage) => {
         if (newPage > 0 && newPage <= Math.ceil(totalCount / limit)) {
             setPage(newPage);
         }
     };
 
-    // Filter handlers
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
         setPage(1);
@@ -182,17 +164,14 @@ const AllUsers = () => {
         setPage(1);
     };
 
-    // Calculate paginated data
     const paginatedUsers = useMemo(() => {
         return totalCount <= 5
             ? filteredUsers
             : filteredUsers.slice((page - 1) * limit, page * limit);
     }, [filteredUsers, page, limit, totalCount]);
 
-    // Check if any filters are active
     const hasActiveFilters = Object.values(filters).some(value => value !== '');
 
-    // UI configuration
     const filterConfig = [
         {
             key: 'name',
@@ -291,7 +270,6 @@ const AllUsers = () => {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
                 <div className="flex space-x-3">
-                    {/* Filter Button */}
                     <Button
                         onClick={() => setShowFilterModal(true)}
                         leftIcon={<FiFilter />}
@@ -306,8 +284,6 @@ const AllUsers = () => {
                             </span>
                         )}
                     </Button>
-
-                    {/* Create User Button */}
                     {canCreateUsers && (
                         <Button
                             onClick={() => setShowCreateUserModal(true)}
@@ -326,14 +302,13 @@ const AllUsers = () => {
                 </div>
             )}
 
-            {/* DataTable without built-in filters */}
             <DataTable
                 data={paginatedUsers}
                 columns={columns}
                 loading={loading}
                 page={page}
                 limit={limit}
-                totalCount={filteredUsers.length} // Use filtered count for pagination
+                totalCount={filteredUsers.length}
                 onPageChange={handlePageChange}
                 onRowClick={setSelectedUser}
                 rowClassName="cursor-pointer hover:bg-[#e6f7ff]"
@@ -343,7 +318,6 @@ const AllUsers = () => {
                 error={error ? { message: error } : null}
             />
 
-            {/* Filter Modal */}
             <FilterModal
                 isOpen={showFilterModal}
                 onClose={() => setShowFilterModal(false)}
@@ -353,7 +327,6 @@ const AllUsers = () => {
                 title="Filter Users"
             />
 
-            {/* Create User Modal */}
             {showCreateUserModal && (
                 <CreateUser
                     isOpen={showCreateUserModal}
@@ -362,7 +335,6 @@ const AllUsers = () => {
                 />
             )}
 
-            {/* Single User Modal */}
             {selectedUser && (
                 <SingleUserModal
                     isOpen={!!selectedUser}

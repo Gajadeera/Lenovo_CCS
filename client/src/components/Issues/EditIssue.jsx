@@ -48,12 +48,11 @@ const EditIssueModal = ({ isOpen, onClose, issueId, initialData, onIssueUpdate }
         existingScreenshots: []
     });
     const [previewImages, setPreviewImages] = useState([]);
-    const [imagesToDelete, setImagesToDelete] = useState([]); // Track images to delete
+    const [imagesToDelete, setImagesToDelete] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { user: currentUser } = useAuth();
 
-    // Initialize form with initialData
     useEffect(() => {
         if (initialData) {
             setFormData({
@@ -75,7 +74,7 @@ const EditIssueModal = ({ isOpen, onClose, issueId, initialData, onIssueUpdate }
             } else {
                 setPreviewImages([]);
             }
-            setImagesToDelete([]); // Reset images to delete
+            setImagesToDelete([]);
         }
     }, [initialData]);
 
@@ -124,33 +123,25 @@ const EditIssueModal = ({ isOpen, onClose, issueId, initialData, onIssueUpdate }
 
     const removeImage = (index) => {
         const imageToRemove = previewImages[index];
-
-        // If it's an existing image, mark it for deletion
         if (imageToRemove.isExisting && imageToRemove.public_id) {
             setImagesToDelete(prev => [...prev, imageToRemove.public_id]);
         }
-
-        // If it's a new image, remove it from the form data
         if (!imageToRemove.isExisting && imageToRemove.file) {
             setFormData(prev => ({
                 ...prev,
                 screenshots: prev.screenshots.filter(file => file !== imageToRemove.file)
             }));
         }
-
-        // Clean up object URL if it's a new image
         if (!imageToRemove.isExisting && imageToRemove.url) {
             URL.revokeObjectURL(imageToRemove.url);
         }
 
-        // Remove from previews
         const updatedPreviews = [...previewImages];
         updatedPreviews.splice(index, 1);
         setPreviewImages(updatedPreviews);
     };
 
     const handleClose = useCallback(() => {
-        // Clean up all object URLs
         previewImages.forEach(image => {
             if (!image.isExisting && image.url) {
                 URL.revokeObjectURL(image.url);
@@ -191,14 +182,10 @@ const EditIssueModal = ({ isOpen, onClose, issueId, initialData, onIssueUpdate }
             formDataToSend.append('status', formData.status);
             formDataToSend.append('priority', formData.priority);
             formDataToSend.append('category', formData.category);
-
-            // Add images to delete
             if (imagesToDelete.length > 0) {
                 formDataToSend.append('screenshots_to_delete', JSON.stringify(imagesToDelete));
                 console.log('Sending images to delete:', imagesToDelete);
             }
-
-            // Add new screenshots
             formData.screenshots.forEach(file => {
                 formDataToSend.append('screenshots', file);
             });
@@ -243,7 +230,6 @@ const EditIssueModal = ({ isOpen, onClose, issueId, initialData, onIssueUpdate }
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-3">
-                    {/* Basic Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <BaseInput
                             label="Title *"
@@ -291,7 +277,6 @@ const EditIssueModal = ({ isOpen, onClose, issueId, initialData, onIssueUpdate }
                         />
                     </div>
 
-                    {/* Description */}
                     <BaseInput
                         label="Description"
                         name="description"
@@ -303,7 +288,6 @@ const EditIssueModal = ({ isOpen, onClose, issueId, initialData, onIssueUpdate }
                         dense
                     />
 
-                    {/* Screenshots - Compact Version */}
                     <div className="space-y-2">
                         <label className="block text-xs font-medium text-gray-500">Screenshots</label>
 
@@ -350,7 +334,6 @@ const EditIssueModal = ({ isOpen, onClose, issueId, initialData, onIssueUpdate }
                         )}
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="flex justify-end space-x-2 pt-2">
                         <Button
                             type="button"
