@@ -14,6 +14,7 @@ const NotificationBell = ({ userId, onNotificationsClick }) => {
     }, [getUnreadCount]);
 
     const handleBellClick = () => {
+        setUnreadCount(0);
         onNotificationsClick();
     };
 
